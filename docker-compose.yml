@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: dispute-resolution-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: LPTClrJREscoLQBYGfykiXRphkgHOqCT
+      POSTGRES_PASSWORD: 4ekweNgouXcFC1zEgm1KIJdvtSYd7jfgH3d92J7VAJcCfKPusQT5ytl0kQWJDcqm
+      POSTGRES_DB: dispute_resolution
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data: 
