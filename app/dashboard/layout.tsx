@@ -1,5 +1,5 @@
 import { requireAuth } from '@/lib/auth'
-import { RegistrarDashboard } from '@/components/dashboards/RegistrarDashboard'
+import { DashboardBase } from '@/components/dashboards/DashboardBase'
 import { CaseManagerDashboard } from '@/components/dashboards/CaseManagerDashboard'
 import { NeutralDashboard } from '@/components/dashboards/NeutralDashboard'
 import { PartyDashboard } from '@/components/dashboards/PartyDashboard'
@@ -13,7 +13,7 @@ export default async function DashboardLayout({
   
   switch (session.user.role) {
     case 'REGISTRAR':
-      return <RegistrarDashboard>{children}</RegistrarDashboard>
+      return <DashboardBase title="Registrar Dashboard">{children}</DashboardBase>
     case 'CASE_MANAGER':
       return <CaseManagerDashboard>{children}</CaseManagerDashboard>
     case 'NEUTRAL':

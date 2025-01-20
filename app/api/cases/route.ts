@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 import { generateCaseInvitationEmail } from '@/lib/email-templates'
 import { Resend } from 'resend'
 import { randomUUID } from 'crypto'
@@ -64,5 +64,117 @@ export async function POST(request: Request) {
       JSON.stringify({ error: 'Error creating case' }),
       { status: 500 }
     )
+  }
+}
+
+export async function GET() {
+  try {
+    console.log('GET /api/cases called') // Debug log
+    const session = await getServerSession(authOptions)
+    console.log('Session:', session) // Debug log
+    
+    if (!session?.user) {
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email! },
+    })
+    console.log('User:', user) // Debug log
+
+    if (!user) {
+      return new NextResponse('User not found', { status: 404 })
+    }
+
+    let cases = []
+
+    // REGISTRAR can see all cases
+    if (user.role === 'REGISTRAR') {
+      cases = await prisma.case.findMany({
+        include: {
+          claimant: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          respondent: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          caseManager: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          neutral: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      })
+    } else {
+      cases = await prisma.case.findMany({
+        where: {
+          OR: [
+            { claimantId: user.id },
+            { respondentId: user.id },
+            { caseManagerId: user.id },
+            { neutralId: user.id },
+          ],
+        },
+        include: {
+          claimant: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          respondent: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          caseManager: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          neutral: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      })
+    }
+
+    console.log('Found cases:', cases) // Debug log
+    return NextResponse.json(cases)
+  } catch (error) {
+    console.error('Error fetching cases:', error)
+    return new NextResponse('Internal Server Error', { status: 500 })
   }
 } 
