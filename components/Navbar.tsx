@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
+import { authOptions } from '@/lib/auth'
 
 export default function Navbar() {
   const { data: session, status } = useSession()
