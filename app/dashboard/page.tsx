@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { DashboardUI } from './components/dashboard-ui'
 import { CaseManagerUI } from './components/case-manager-ui'
 import { NeutralUI } from './components/neutral-ui'
+import { authOptions } from '@/lib/auth'
 
 export default async function DashboardPage() {
   const session = await requireAuth(['CLAIMANT', 'RESPONDENT', 'CASE_MANAGER', 'REGISTRAR', 'NEUTRAL'])
