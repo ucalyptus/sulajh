@@ -1,10 +1,12 @@
 import { requireAuth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { CaseList } from '@/components/CaseList'
+import { DashboardUI } from './components/dashboard-ui'
+import { CaseManagerUI } from './components/case-manager-ui'
+import { NeutralUI } from './components/neutral-ui'
 
 export default async function DashboardPage() {
   const session = await requireAuth(['CLAIMANT', 'RESPONDENT', 'CASE_MANAGER', 'REGISTRAR', 'NEUTRAL'])
-
+  
   let cases = []
   
   switch (session.user.role) {
@@ -20,34 +22,68 @@ export default async function DashboardPage() {
           claimant: true,
           respondent: true,
           caseManager: true
+        },
+        orderBy: {
+          createdAt: 'desc'
         }
       })
-      break
+      return <DashboardUI initialCases={cases} />
       
     case 'CASE_MANAGER':
       cases = await prisma.case.findMany({
         where: { 
-          caseManagerId: session.user.id
+          caseManagerId: session.user.id,
+          NOT: {
+            status: 'CLOSED'
+          }
         },
         include: {
-          claimant: true,
-          respondent: true
+          claimant: {
+            select: {
+              name: true,
+              email: true
+            }
+          },
+          respondent: {
+            select: {
+              name: true,
+              email: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
         }
       })
-      break
+      return <CaseManagerUI initialCases={cases} />
       
     case 'NEUTRAL':
       cases = await prisma.case.findMany({
         where: { 
-          status: 'NEUTRAL_ASSIGNED',
-          // Add neutral ID when implemented
+          neutralId: session.user.id,
+          NOT: {
+            status: 'CLOSED'
+          }
         },
         include: {
-          claimant: true,
-          respondent: true
+          claimant: {
+            select: {
+              name: true,
+              email: true
+            }
+          },
+          respondent: {
+            select: {
+              name: true,
+              email: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
         }
       })
-      break
+      return <NeutralUI initialCases={cases} />
       
     case 'CLAIMANT':
       cases = await prisma.case.findMany({
@@ -74,5 +110,5 @@ export default async function DashboardPage() {
       break
   }
 
-  return <CaseList cases={cases} userRole={session.user.role} />
+  return <DashboardUI initialCases={cases} />
 } 

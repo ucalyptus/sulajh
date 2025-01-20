@@ -3,7 +3,7 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "functions": {
-    "api/**/*": {
+    "app/api/**/*": {
       "memory": 1024
     }
   }
