@@ -42,6 +42,9 @@ interface UserInvitationEmailProps {
 }
 
 export function generateUserInvitationEmail({ name, email, password, role }: UserInvitationEmailProps): string {
+  // Use "there" as fallback if name matches email exactly
+  const greeting = name === email ? 'there' : name;
+  
   return `
     <!DOCTYPE html>
     <html>
@@ -55,7 +58,7 @@ export function generateUserInvitationEmail({ name, email, password, role }: Use
             Welcome to the Dispute Resolution Platform
           </h1>
           <p style="color: #3f3f46; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
-            Hello ${name},
+            Hello ${greeting},
           </p>
           <p style="color: #3f3f46; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
             Your account has been created as a ${role}. Here are your login credentials:

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 import { hash } from 'bcryptjs'
 import { generatePassword } from '@/lib/utils'
 import { generateUserInvitationEmail } from '@/lib/email-templates'
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
         to: toEmail,
         subject: `Welcome to the Platform - Your ${role} Account`,
         html: emailHtml,
-        reply_to: process.env.SUPPORT_EMAIL
+        replyTo: process.env.SUPPORT_EMAIL
       })
 
       console.log('Email sent successfully:', emailResult)

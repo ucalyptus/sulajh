@@ -54,7 +54,8 @@ export async function POST(request: Request) {
       to: respondentEmail,
       subject: 'You have been invited to respond to a case',
       text: `You have been invited to respond to case #${case_.id}. 
-      Click here to respond: ${process.env.NEXT_PUBLIC_APP_URL}/auth/signup?token=${token}`
+      Click here to respond: ${process.env.NEXT_PUBLIC_APP_URL}/auth/signup?token=${token}`,
+      from: process.env.RESEND_FROM_EMAIL || 'sulajh@resend.ucalyptus.me'
     })
 
     return NextResponse.json(case_)
