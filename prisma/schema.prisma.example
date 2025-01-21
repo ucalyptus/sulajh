@@ -1,0 +1,90 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String
+  role          UserRole  @default(CLAIMANT)
+  
+  // Cases where user is claimant
+  claimantCases Case[]    @relation("ClaimantCases")
+  // Cases where user is respondent
+  respondentCases Case[]  @relation("RespondentCases")
+  // Cases where user is case manager
+  managedCases  Case[]    @relation("ManagedCases")
+  // Cases where user is neutral
+  neutralCases  Case[]    @relation("NeutralCases")
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Case {
+  id                String    @id @default(cuid())
+  status           String    @default("DRAFT")
+  claimantRequest  String?
+  respondentResponse String?
+  finalDecision    String?
+  neutralAssigned  Boolean   @default(false)
+  
+  // Relations
+  claimant         User      @relation("ClaimantCases", fields: [claimantId], references: [id])
+  claimantId       String
+  
+  respondent       User?     @relation("RespondentCases", fields: [respondentId], references: [id])
+  respondentId     String?
+  
+  caseManager      User?     @relation("ManagedCases", fields: [caseManagerId], references: [id])
+  caseManagerId    String?
+  
+  // Neutral relationship
+  neutralId        String?
+  neutral          User?    @relation("NeutralCases", fields: [neutralId], references: [id])
+  
+  // Invitations
+  invitations      CaseInvitation[]
+  
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model CaseInvitation {
+  id          String    @id @default(cuid())
+  caseId      String
+  email       String
+  token       String    @unique
+  status      String    @default("PENDING") // PENDING, ACCEPTED, EXPIRED
+  case        Case      @relation(fields: [caseId], references: [id])
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime
+}
+
+enum UserRole {
+  CLAIMANT
+  RESPONDENT
+  CASE_MANAGER
+  REGISTRAR
+  NEUTRAL
+}
+
+enum CaseStatus {
+  PENDING_RESPONDENT
+  ASSIGNED_TO_MANAGER
+  PRE_PROCEEDING_SCHEDULED
+  PRE_PROCEEDING_COMPLETED
+  PENDING_NEUTRAL
+  NEUTRAL_ASSIGNED
+  IN_PROGRESS
+  DECISION_ISSUED
+  CLOSED
+  APPEALED
+} 
