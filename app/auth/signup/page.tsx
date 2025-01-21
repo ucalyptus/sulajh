@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import SignUpForm from '@/components/SignUpForm'
 
@@ -17,7 +17,7 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
 
   let invitationData = null
   if (searchParams.invitation) {
-    const invitation = await prisma.caseInvitation.findUnique({
+    const invitation = await prisma.CaseInvitation.findUnique({
       where: { token: searchParams.invitation },
       select: { email: true }
     })

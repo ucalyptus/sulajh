@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { CaseDetailUI } from './components/case-detail-ui'
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 
 async function getCaseWithDetails(id: string) {
   return prisma.case.findUnique({

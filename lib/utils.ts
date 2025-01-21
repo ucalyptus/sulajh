@@ -22,3 +22,12 @@ export function formatDate(date: string | Date) {
     day: 'numeric'
   })
 }
+
+export function getNameFromEmail(email: string): string {
+  const localPart = email.split('@')[0];
+  // Convert something like "john.doe" or "johndoe" to "John Doe"
+  return localPart
+    .split(/[._-]/)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}

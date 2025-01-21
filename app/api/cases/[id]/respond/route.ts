@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { hash } from 'bcryptjs'
-import { generatePassword } from '@/lib/utils'
+import { generatePassword, getNameFromEmail } from '@/lib/utils'
 import { Resend } from 'resend'
 import { generateUserInvitationEmail } from '@/lib/email-templates'
 
@@ -74,14 +74,13 @@ export async function POST(
 
     // Only send credentials email if this is a new user
     if (tempPassword) {
+      const displayName = getNameFromEmail(invitation.email);
       await resend.emails.send({
         from: 'Dispute Resolution <onboarding@resend.dev>',
-        to: process.env.NODE_ENV === 'development' 
-          ? process.env.VERIFIED_EMAIL! 
-          : invitation.email,
+        to: invitation.email,
         subject: 'Your Account Details',
         html: generateUserInvitationEmail({
-          name: invitation.email,
+          name: displayName,
           email: invitation.email,
           password: tempPassword,
           role: 'RESPONDENT'
@@ -92,9 +91,7 @@ export async function POST(
     // Send confirmation email
     await resend.emails.send({
       from: 'Dispute Resolution <onboarding@resend.dev>',
-      to: process.env.NODE_ENV === 'development' 
-        ? process.env.VERIFIED_EMAIL! 
-        : invitation.email,
+      to: invitation.email,
       subject: `Response Submitted - Case #${params.id}`,
       html: `
         <h1>Response Submitted Successfully</h1>
