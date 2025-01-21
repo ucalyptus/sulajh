@@ -1,27 +1,28 @@
 // Main landing page
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession(authOptions)
+
   return (
-    <div className="container mx-auto p-8">
-      <h1 className="text-4xl font-bold mb-8">Dispute Resolution Platform</h1>
-      <div className="grid gap-4">
-        <Link href="/claimant">
-          <Button className="w-full">File a New Claim</Button>
-        </Link>
-        <Link href="/respondent">
-          <Button className="w-full">Respond to a Claim</Button>
-        </Link>
-        <Link href="/case-manager">
-          <Button className="w-full">Case Manager Portal</Button>
-        </Link>
-        <Link href="/neutral">
-          <Button className="w-full">Neutral Portal</Button>
-        </Link>
-        <Link href="/registrar">
-          <Button className="w-full">Registrar Portal</Button>
-        </Link>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Online Dispute Resolution Platform
+          </h1>
+          <p className="text-xl text-gray-600 mb-8">
+            Resolve disputes efficiently and fairly
+          </p>
+          <Link href="/cases/new">
+            <Button size="lg">
+              File a Claim
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   )
