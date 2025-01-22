@@ -75,11 +75,11 @@ export default async function CasePage({ params }: { params: { id: string } }) {
       respondentResponse: true,
       status: true,
       createdAt: true,
-      claimantId: true,    // Added to check permissions
-      respondentId: true,  // Added to check permissions
-      caseManagerId: true, // Added to check permissions
-      neutralId: true,     // Added to check permissions
-      finalDecision: true,  // Added this field
+      claimantId: true,
+      respondentId: true,
+      caseManagerId: true,
+      neutralId: true,
+      finalDecision: true,
       respondent: {
         select: {
           email: true
@@ -94,6 +94,20 @@ export default async function CasePage({ params }: { params: { id: string } }) {
       neutral: {
         select: {
           name: true,
+          email: true
+        }
+      },
+      invitations: {
+        where: {
+          status: 'PENDING'
+        },
+        select: {
+          email: true
+        },
+        take: 1
+      },
+      claimant: {
+        select: {
           email: true
         }
       }
@@ -183,21 +197,32 @@ export default async function CasePage({ params }: { params: { id: string } }) {
               </div>
             )}
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="font-semibold mb-2">Case Information</h3>
-                <dl className="space-y-2 text-sm">
-                  <div>
-                    <dt className="text-gray-500">Filed On</dt>
-                    <dd>{formatDate(case_.createdAt)}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-gray-500">Respondent</dt>
-                    <dd>{case_.respondent?.email || 'Not assigned'}</dd>
-                  </div>
-                </dl>
-              </div>
+            <div>
+              <h3 className="font-semibold mb-2">Case Information</h3>
+              <dl className="space-y-2 text-sm">
+                <div>
+                  <dt className="text-gray-500">Filed On</dt>
+                  <dd>{formatDate(case_.createdAt)}</dd>
+                </div>
+                <div>
+                  <dt className="text-gray-500">Claimant</dt>
+                  <dd>{case_.claimant.email}</dd>
+                </div>
+                <div>
+                  <dt className="text-gray-500">Respondent</dt>
+                  <dd>
+                    {case_.respondent?.email || 
+                      (case_.invitations[0]?.email && 
+                        `${case_.invitations[0].email}`
+                      ) || 
+                      'Not assigned'
+                    }
+                  </dd>
+                </div>
+              </dl>
+            </div>
 
+            <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h3 className="font-semibold mb-2">Case Officials</h3>
                 <dl className="space-y-2 text-sm">
