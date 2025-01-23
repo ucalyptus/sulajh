@@ -11,9 +11,6 @@ import { sendEmail } from '@/lib/email'
 // Initialize Resend
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-// Use this email for development
-const DEV_EMAIL = 'melker_personal@proton.me' // Your verified email
-
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions)
@@ -23,6 +20,13 @@ export async function POST(request: Request) {
     }
 
     const { claimantRequest, respondentEmail } = await request.json()
+
+    if (!claimantRequest?.trim()) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Claim details are required' }), 
+        { status: 400 }
+      )
+    }
 
     // Create invitation token
     const token = uuidv4()
