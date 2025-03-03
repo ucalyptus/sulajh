@@ -1,6 +1,6 @@
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -9,63 +9,63 @@ generator client {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  password      String
-  role          UserRole  @default(CLAIMANT)
-  
+  id       String   @id @default(cuid())
+  name     String?
+  email    String   @unique
+  password String
+  role     UserRole @default(CLAIMANT)
+
   // Cases where user is claimant
-  claimantCases Case[]    @relation("ClaimantCases")
+  claimantCases   Case[] @relation("ClaimantCases")
   // Cases where user is respondent
-  respondentCases Case[]  @relation("RespondentCases")
+  respondentCases Case[] @relation("RespondentCases")
   // Cases where user is case manager
-  managedCases  Case[]    @relation("ManagedCases")
+  managedCases    Case[] @relation("ManagedCases")
   // Cases where user is neutral
-  neutralCases  Case[]    @relation("NeutralCases")
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  neutralCases    Case[] @relation("NeutralCases")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Case {
-  id                String    @id @default(cuid())
-  status           String    @default("DRAFT")
-  claimantRequest  String?
+  id                 String  @id @default(cuid())
+  status             String  @default("DRAFT")
+  claimantRequest    String?
   respondentResponse String?
-  finalDecision    String?
-  neutralAssigned  Boolean   @default(false)
-  
+  finalDecision      String?
+  neutralAssigned    Boolean @default(false)
+
   // Relations
-  claimant         User      @relation("ClaimantCases", fields: [claimantId], references: [id])
-  claimantId       String
-  
-  respondent       User?     @relation("RespondentCases", fields: [respondentId], references: [id])
-  respondentId     String?
-  
-  caseManager      User?     @relation("ManagedCases", fields: [caseManagerId], references: [id])
-  caseManagerId    String?
-  
+  claimant   User   @relation("ClaimantCases", fields: [claimantId], references: [id])
+  claimantId String
+
+  respondent   User?   @relation("RespondentCases", fields: [respondentId], references: [id])
+  respondentId String?
+
+  caseManager   User?   @relation("ManagedCases", fields: [caseManagerId], references: [id])
+  caseManagerId String?
+
   // Neutral relationship
-  neutralId        String?
-  neutral          User?    @relation("NeutralCases", fields: [neutralId], references: [id])
-  
+  neutralId String?
+  neutral   User?   @relation("NeutralCases", fields: [neutralId], references: [id])
+
   // Invitations
-  invitations      CaseInvitation[]
-  
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  invitations CaseInvitation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model CaseInvitation {
-  id          String    @id @default(cuid())
-  caseId      String
-  email       String
-  token       String    @unique
-  status      String    @default("PENDING") // PENDING, ACCEPTED, EXPIRED
-  case        Case      @relation(fields: [caseId], references: [id])
-  createdAt   DateTime  @default(now())
-  expiresAt   DateTime
+  id        String   @id @default(cuid())
+  caseId    String
+  email     String
+  token     String   @unique
+  status    String   @default("PENDING") // PENDING, ACCEPTED, EXPIRED
+  case      Case     @relation(fields: [caseId], references: [id])
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 }
 
 enum UserRole {
@@ -87,4 +87,4 @@ enum CaseStatus {
   DECISION_ISSUED
   CLOSED
   APPEALED
-} 
+}
