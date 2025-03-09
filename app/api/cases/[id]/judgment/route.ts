@@ -1,14 +1,8 @@
-import { OpenAIStream, StreamingTextResponse } from 'ai'
-import OpenAI from 'openai'
+import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { NextResponse } from 'next/server'
 import { sendEmail } from '@/lib/email'
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
 
 export async function POST(
   request: Request,
@@ -38,41 +32,47 @@ export async function POST(
       return new NextResponse('Judgment already issued', { status: 400 })
     }
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4',
-      stream: false,
-      messages: [
-        {
-          role: 'system',
-          content: `You are an experienced arbitrator with deep expertise in dispute resolution. 
-          Your role is to:
-          1. Carefully analyze the presented claims and responses
-          2. Consider principles of fairness, applicable norms, and precedent
-          3. Evaluate evidence and arguments objectively
-          4. Make clear, reasoned decisions
-          5. Provide specific, actionable recommendations
-          
-          Structure your response professionally and authoritatively.
-          Be decisive and clear in your ruling while maintaining impartiality.
-          Consider both immediate resolution and long-term relationship implications.`
-        },
-        {
-          role: 'user',
-          content: JSON.stringify({
-            caseId: case_.id,
-            claimantRequest: case_.claimantRequest,
-            respondentResponse: case_.respondentResponse,
-            context: {
-              claimantType: case_.claimant.role,
-              respondentType: case_.respondent?.role,
-              caseStatus: case_.status
-            }
-          })
+    const response = await fetch('http://127.0.0.1:11434/api/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama3.2',
+        prompt: `You are an experienced arbitrator with deep expertise in dispute resolution. 
+        Your role is to:
+        1. Carefully analyze the presented claims and responses
+        2. Consider principles of fairness, applicable norms, and precedent
+        3. Evaluate evidence and arguments objectively
+        4. Make clear, reasoned decisions
+        5. Provide specific, actionable recommendations
+        
+        Structure your response professionally and authoritatively.
+        Be decisive and clear in your ruling while maintaining impartiality.
+        Consider both immediate resolution and long-term relationship implications.
+
+        Case details:
+        ${JSON.stringify({
+          caseId: case_.id,
+          claimantRequest: case_.claimantRequest,
+          respondentResponse: case_.respondentResponse,
+          context: {
+            claimantType: case_.claimant.role,
+            respondentType: case_.respondent?.role,
+            caseStatus: case_.status
+          }
+        })}`,
+        options: {
+          temperature: 0.7,
+          top_k: 40,
+          top_p: 0.9,
+          num_predict: 2048
         }
-      ]
+      })
     })
 
-    const judgment = response.choices[0].message.content
+    const result = await response.json()
+    const judgment = result.response
 
     // Update case with judgment and status
     const updatedCase = await prisma.case.update({
