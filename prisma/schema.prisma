@@ -29,12 +29,47 @@ model User {
 }
 
 model Case {
-  id                 String  @id @default(cuid())
-  status             String  @default("DRAFT")
-  claimantRequest    String?
-  respondentResponse String?
+  id                 String    @id @default(cuid())
+  status             String    @default("DRAFT")
+  
+  // Claimant Information
+  claimantRequest    String?   // Brief description of the issue
+  claimantPhone      String?   // Phone number
+  claimantAddress    String?   // Address
+  preferredContact   String?   // Preferred method of contact
+  accountNumber      String?   // ID/account number if applicable
+  
+  // Respondent Information
+  respondentResponse String?   // Response from respondent
+  respondentPhone    String?   // Respondent phone if known
+  respondentAddress  String?   // Respondent address if known
+  relationship       String?   // Relationship to claimant
+  
+  // Dispute Details
+  incidentDate      DateTime? // Date of incident/transaction
+  incidentLocation  String?   // Location/venue
+  disputeAmount     Float?    // Amount in dispute (if monetary)
+  disputeCategory   String?   // Category of dispute
+  desiredResolution String?   // Desired resolution/remedy
+  
+  // Evidence
+  evidenceFiles     String[]  // Array of file URLs
+  evidenceNotes     String?   // Description of evidence
+  witnesses         Json?     // Witness information as JSON
+  
+  // Previous Resolution Attempts
+  priorContact      Boolean   @default(false)
+  priorContactDates String?   // Dates of previous communication
+  priorMethods      String?   // Methods of previous communication
+  priorResults      String?   // Results of previous attempts
+  
+  // Declaration
+  truthStatement    Boolean   @default(false)
+  signature         String?   // Electronic signature
+  submissionDate    DateTime  @default(now())
+  
   finalDecision      String?
-  neutralAssigned    Boolean @default(false)
+  neutralAssigned    Boolean  @default(false)
 
   // Relations
   claimant   User   @relation("ClaimantCases", fields: [claimantId], references: [id])

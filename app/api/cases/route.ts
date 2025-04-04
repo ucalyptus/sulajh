@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     // Create invitation token
     const token = uuidv4()
     const expiresAt = new Date()
-    expiresAt.setDate(expiresAt.getDate() + 365) // Token expires in 1 year
+    expiresAt.setDate(expiresAt.getDate() + 7) // Token expires in 7 days
 
     // Create case with connected claimant and invitation
     const case_ = await prisma.case.create({
@@ -50,22 +50,49 @@ export async function POST(request: Request) {
             expiresAt
           }
         }
+      },
+      include: {
+        claimant: {
+          select: {
+            name: true,
+            email: true
+          }
+        }
       }
     })
 
-    // Send invitation email
-    await sendEmail({
-      to: respondentEmail,
-      subject: 'You have been invited to respond to a case',
-      text: `You have been invited to respond to case #${case_.id}. 
-      Click here to respond: ${process.env.NEXT_PUBLIC_APP_URL}/auth/signup?token=${token}`,
-      from: process.env.RESEND_FROM_EMAIL || 'sulajh@resend.ucalyptus.me'
+    // Generate the invitation URL
+    const inviteUrl = `${process.env.NEXTAUTH_URL}/auth/signup?invitation=${token}`
+
+    // Generate email content
+    const emailHtml = generateCaseInvitationEmail({
+      inviteUrl,
+      caseId: case_.id
     })
+
+    // Send invitation email
+    try {
+      await resend.emails.send({
+        from: `Sulajh <${process.env.RESEND_FROM_EMAIL || 'sulajh@resend.ucalyptus.me'}>`,
+        to: process.env.NODE_ENV === 'development' ? process.env.VERIFIED_EMAIL! : respondentEmail,
+        subject: `Case Response Required - Case #${case_.id}`,
+        html: emailHtml,
+        replyTo: process.env.SUPPORT_EMAIL
+      })
+
+      console.log('Invitation email sent successfully to:', process.env.NODE_ENV === 'development' ? process.env.VERIFIED_EMAIL : respondentEmail)
+    } catch (emailError) {
+      console.error('Error sending invitation email:', emailError)
+      // Don't fail the request if email fails
+    }
 
     return NextResponse.json(case_)
   } catch (error) {
     console.error('Error creating case:', error)
-    return new NextResponse('Error creating case', { status: 500 })
+    return new NextResponse(
+      JSON.stringify({ error: 'Error creating case' }),
+      { status: 500 }
+    )
   }
 }
 

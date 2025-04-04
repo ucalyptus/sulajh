@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { signIn } from 'next-auth/react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 type InvitationData = {
   email: string
@@ -19,6 +20,7 @@ export default function SignUpForm({ invitationData }: SignUpFormProps) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState(invitationData?.email || '')
   const [password, setPassword] = useState('')
+  const [role, setRole] = useState<'CLAIMANT' | 'RESPONDENT' | 'NEUTRAL'>('CLAIMANT')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -35,7 +37,8 @@ export default function SignUpForm({ invitationData }: SignUpFormProps) {
           name, 
           email, 
           password,
-          role: invitationData ? 'RESPONDENT' : 'CLAIMANT',
+          // If there's an invitation, use RESPONDENT role, otherwise use selected role
+          role: invitationData ? 'RESPONDENT' : role,
           invitationToken: invitationData?.token
         }),
       })
@@ -81,6 +84,7 @@ export default function SignUpForm({ invitationData }: SignUpFormProps) {
           required
         />
       </div>
+      
       <div>
         <label className="block text-sm font-medium mb-2">Email</label>
         <input
@@ -92,6 +96,7 @@ export default function SignUpForm({ invitationData }: SignUpFormProps) {
           disabled={!!invitationData}
         />
       </div>
+
       <div>
         <label className="block text-sm font-medium mb-2">Password</label>
         <input
@@ -99,19 +104,39 @@ export default function SignUpForm({ invitationData }: SignUpFormProps) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full p-2 border rounded"
-          minLength={6}
           required
         />
       </div>
+
+      {!invitationData && (
+        <div>
+          <label className="block text-sm font-medium mb-2">Role</label>
+          <Select
+            value={role}
+            onValueChange={(value: 'CLAIMANT' | 'RESPONDENT' | 'NEUTRAL') => setRole(value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select your role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="CLAIMANT">Claimant</SelectItem>
+              <SelectItem value="RESPONDENT">Respondent</SelectItem>
+              <SelectItem value="NEUTRAL">Neutral Party</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       {error && (
         <p className="text-red-500 text-sm">{error}</p>
       )}
+
       <Button
         type="submit"
         className="w-full"
         disabled={isLoading}
       >
-        {isLoading ? 'Creating Account...' : 'Sign Up'}
+        {isLoading ? 'Signing up...' : 'Sign Up'}
       </Button>
     </form>
   )
