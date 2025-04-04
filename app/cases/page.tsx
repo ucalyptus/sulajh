@@ -4,113 +4,118 @@ import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
+import { Case } from '@/types/case'
+import { auth } from "@/lib/auth"
+import { redirect } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { Card } from "@/components/ui/card"
+import { formatDistanceToNow } from "date-fns"
 
-interface Case {
-  id: string
-  status: string
-  claimant: {
-    name?: string
-    email: string
-  }
-  respondent?: {
-    name?: string
-    email: string
+const getEmptyStateMessage = (role: string) => {
+  switch (role) {
+    case 'CLAIMANT':
+      return "You haven't filed any cases yet."
+    case 'RESPONDENT':
+      return "You haven't received any cases yet."
+    case 'NEUTRAL':
+      return "You haven't received mediation requests for any cases yet."
+    case 'CASE_MANAGER':
+      return "You haven't been assigned any cases yet."
+    default:
+      return "No cases found."
   }
 }
 
-export default function CasesPage() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const [cases, setCases] = useState<Case[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+export default async function CasesPage() {
+  const session = await auth()
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/signin')
-      return
-    }
-
-    if (status === 'authenticated') {
-      console.log('Fetching cases...') // Debug log
-      fetch('/api/cases', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(async (res) => {
-          if (!res.ok) {
-            const errorText = await res.text()
-            throw new Error(`Failed to fetch cases: ${errorText}`)
-          }
-          return res.json()
-        })
-        .then(data => {
-          console.log('Cases data:', data) // Debug log
-          setCases(data)
-          setLoading(false)
-        })
-        .catch(error => {
-          console.error('Error fetching cases:', error)
-          setError(error.message)
-          setLoading(false)
-        })
-    }
-  }, [status, router])
-
-  if (status === 'loading' || loading) {
-    return (
-      <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Cases</h1>
-        <p>Loading cases...</p>
-      </div>
-    )
+  if (!session?.user) {
+    redirect("/login")
   }
 
-  if (error) {
-    return (
-      <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Cases</h1>
-        <p className="text-red-500">Error: {error}</p>
-      </div>
-    )
-  }
+  const role = session.user.role
+  const userId = session.user.id
 
-  if (cases.length === 0) {
-    return (
-      <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Cases</h1>
-        <p>No cases found.</p>
-      </div>
-    )
-  }
+  const cases = await prisma.case.findMany({
+    where: {
+      OR: [
+        { claimantId: userId },
+        { respondentId: userId },
+        { neutralId: userId },
+        { caseManagerId: userId },
+      ],
+    },
+    include: {
+      claimant: {
+        select: { id: true, name: true, email: true },
+      },
+      respondent: {
+        select: { id: true, name: true, email: true },
+      },
+      neutral: {
+        select: { id: true, name: true, email: true },
+      },
+      caseManager: {
+        select: { id: true, name: true, email: true },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  })
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Cases</h1>
-      <div className="space-y-4">
-        {cases.map((case_) => (
-          <div 
-            key={case_.id} 
-            className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow"
-            onClick={() => router.push(`/cases/${case_.id}`)}
-            role="button"
-            tabIndex={0}
-          >
-            <h2 className="font-semibold">Case #{case_.id}</h2>
-            <p className="text-sm text-gray-600">Status: {case_.status}</p>
-            <p className="text-sm text-gray-600">
-              Claimant: {case_.claimant?.name || case_.claimant?.email}
-            </p>
-            {case_.respondent && (
-              <p className="text-sm text-gray-600">
-                Respondent: {case_.respondent?.name || case_.respondent?.email}
-              </p>
-            )}
-          </div>
-        ))}
+    <div className="container mx-auto py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold">My Cases</h1>
+        {role === "CLAIMANT" && (
+          <Button asChild>
+            <Link href="/cases/new">File a New Case</Link>
+          </Button>
+        )}
       </div>
+
+      {cases.length === 0 ? (
+        <Card className="p-8 text-center">
+          <p className="text-gray-600">{getEmptyStateMessage(role)}</p>
+          {role === "CLAIMANT" && (
+            <Button asChild className="mt-4">
+              <Link href="/cases/new">File Your First Case</Link>
+            </Button>
+          )}
+        </Card>
+      ) : (
+        <div className="grid gap-4">
+          {cases.map((case_: Case) => (
+            <Link key={case_.id} href={`/cases/${case_.id}`}>
+              <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold mb-2">Case #{case_.id.slice(0, 8)}</h3>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Status: {case_.status}
+                    </p>
+                    {role === "REGISTRAR" && (
+                      <>
+                        <p className="text-sm text-gray-600">
+                          Claimant: {case_.claimant?.name || case_.claimant?.email}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Respondent: {case_.respondent?.name || case_.respondent?.email}
+                        </p>
+                      </>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500">
+                    {formatDistanceToNow(new Date(case_.createdAt), { addSuffix: true })}
+                  </p>
+                </div>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   )
 } 

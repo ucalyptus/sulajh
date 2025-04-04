@@ -1,10 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 
 export default function NavMenu() {
   const { data: session } = useSession()
+
+  const handleSignOut = async () => {
+    await signOut({ redirect: true, callbackUrl: '/' })
+  }
 
   return (
     <nav className="bg-gray-800 text-white p-4">
@@ -16,7 +20,12 @@ export default function NavMenu() {
           {session ? (
             <>
               <Link href="/dashboard">Dashboard</Link>
-              <Link href="/api/auth/signout">Sign Out</Link>
+              <button 
+                onClick={handleSignOut}
+                className="text-white hover:text-gray-300"
+              >
+                Sign Out
+              </button>
             </>
           ) : (
             <>
