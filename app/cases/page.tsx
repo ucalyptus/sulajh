@@ -1,16 +1,11 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import { authOptions } from '@/lib/auth'
-import { Case } from '@/types/case'
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Card } from "@/components/ui/card"
 import { formatDistanceToNow } from "date-fns"
+import { prisma } from "@/lib/prisma"
+import type { Case } from "@/types/case"
 
 const getEmptyStateMessage = (role: string) => {
   switch (role) {
@@ -31,7 +26,7 @@ export default async function CasesPage() {
   const session = await auth()
 
   if (!session?.user) {
-    redirect("/login")
+    redirect("/auth/signin")
   }
 
   const role = session.user.role

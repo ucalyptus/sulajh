@@ -92,4 +92,8 @@ export async function requireAuth(allowedRoles: UserRole[]) {
   }
 
   return session
+}
+
+export async function auth() {
+  return await getServerSession(authOptions)
 } 
