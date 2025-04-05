@@ -3,6 +3,9 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
+// Mark this route as dynamic
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     console.log('Fetching admin cases...') // Debug log
@@ -10,7 +13,7 @@ export async function GET() {
     console.log('Session:', session) // Debug log
     
     if (!session?.user) {
-      return new NextResponse('Unauthorized', { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const user = await prisma.user.findUnique({
@@ -19,7 +22,7 @@ export async function GET() {
     console.log('User:', user) // Debug log
 
     if (!user || user.role !== 'REGISTRAR') {
-      return new NextResponse('Forbidden', { status: 403 })
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const cases = await prisma.case.findMany({
@@ -62,6 +65,9 @@ export async function GET() {
     return NextResponse.json(cases)
   } catch (error) {
     console.error('Error fetching cases:', error)
-    return new NextResponse('Internal Server Error', { status: 500 })
+    return NextResponse.json(
+      { error: 'Internal Server Error' }, 
+      { status: 500 }
+    )
   }
 } 
