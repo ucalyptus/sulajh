@@ -8,9 +8,10 @@ import { toast } from "sonner"
 import ReactMarkdown from 'react-markdown'
 import { Card } from "@/components/ui/card"
 import { CaseJudgment } from "@/components/case-judgment"
+import { CaseWithRelations } from '@/app/types'
 
 interface NeutralViewProps {
-  caseData: any
+  caseData: CaseWithRelations
 }
 
 export function NeutralView({ caseData }: NeutralViewProps) {
@@ -34,8 +35,8 @@ export function NeutralView({ caseData }: NeutralViewProps) {
       toast.success('Judgment generated and saved successfully')
       router.refresh()
     } catch (error) {
-      console.error('Error generating judgment:', error)
-      toast.error('Failed to generate judgment')
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate judgment'
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }

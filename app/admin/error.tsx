@@ -1,0 +1,37 @@
+'use client'
+
+import { useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import Link from 'next/link'
+
+export default function AdminError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string }
+  reset: () => void
+}) {
+  useEffect(() => {
+    console.error('Admin error:', error)
+  }, [error])
+
+  return (
+    <div className="container mx-auto p-8">
+      <Card className="max-w-2xl mx-auto p-8 text-center">
+        <h2 className="text-2xl font-bold text-red-600 mb-4">
+          Admin panel error
+        </h2>
+        <p className="text-gray-600 mb-6">
+          {error.message || 'An error occurred in the admin panel.'}
+        </p>
+        <div className="flex gap-4 justify-center">
+          <Button onClick={reset}>Try again</Button>
+          <Link href="/dashboard">
+            <Button variant="outline">Go to dashboard</Button>
+          </Link>
+        </div>
+      </Card>
+    </div>
+  )
+}
