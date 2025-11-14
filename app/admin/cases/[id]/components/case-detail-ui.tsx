@@ -13,17 +13,13 @@ import {
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 
-interface User {
-  id: string
-  name?: string
-  email: string
-}
+import { CaseWithRelations, UserBasicInfo } from '@/app/types'
 
 interface CaseDetailUIProps {
-  caseData: any
+  caseData: CaseWithRelations
   availableUsers: {
-    caseManagers: User[]
-    neutrals: User[]
+    caseManagers: UserBasicInfo[]
+    neutrals: UserBasicInfo[]
   }
 }
 
@@ -56,8 +52,8 @@ export function CaseDetailUI({ caseData, availableUsers }: CaseDetailUIProps) {
       toast.success(`${role === 'caseManager' ? 'Case Manager' : 'Neutral'} assigned successfully`)
       router.refresh()
     } catch (error) {
-      console.error('Error assigning user:', error)
-      toast.error('Failed to assign user')
+      const errorMessage = error instanceof Error ? error.message : 'Failed to assign user'
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
