@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { logger } from '@/lib/logger'
 
 export default function Error({
   error,
@@ -12,8 +13,7 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log error to monitoring service
-    console.error('Application error:', error)
+    logger.error('Application error', error, { component: 'RootError', digest: error.digest })
   }, [error])
 
   return (
