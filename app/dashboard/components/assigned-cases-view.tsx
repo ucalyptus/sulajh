@@ -5,23 +5,10 @@ import Link from 'next/link'
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/lib/utils"
 import { UserRole } from '@prisma/client'
-
-interface Case {
-  id: string
-  status: string
-  claimant: {
-    name?: string | null
-    email: string
-  }
-  respondent?: {
-    name?: string | null
-    email: string
-  } | null
-  createdAt: string
-}
+import { AssignedCaseView } from '@/app/types'
 
 interface AssignedCasesViewProps {
-  initialCases: Case[]
+  initialCases: AssignedCaseView[]
   allowedRole: UserRole
   title?: string
 }

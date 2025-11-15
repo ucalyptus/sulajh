@@ -1,21 +1,8 @@
 import { AssignedCasesView } from './assigned-cases-view'
-
-interface Case {
-  id: string
-  status: string
-  claimant: {
-    name?: string | null
-    email: string
-  }
-  respondent?: {
-    name?: string | null
-    email: string
-  } | null
-  createdAt: string
-}
+import { AssignedCaseView } from '@/app/types'
 
 interface NeutralUIProps {
-  initialCases: Case[]
+  initialCases: AssignedCaseView[]
 }
 
 export function NeutralUI({ initialCases }: NeutralUIProps) {

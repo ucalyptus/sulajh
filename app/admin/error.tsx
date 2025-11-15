@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
+import { logger } from '@/lib/logger'
 
 export default function AdminError({
   error,
@@ -13,7 +14,7 @@ export default function AdminError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error('Admin error:', error)
+    logger.error('Admin error', error, { component: 'AdminError', digest: error.digest })
   }, [error])
 
   return (

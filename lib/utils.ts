@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { logger } from './logger'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -32,7 +33,7 @@ export function formatDate(date: string | Date | null | undefined): string {
       day: 'numeric'
     })
   } catch (error) {
-    console.error('Error formatting date:', error)
+    logger.error('Error formatting date', error)
     return 'Invalid date'
   }
 }
@@ -49,16 +50,35 @@ export function formatRelativeDate(date: string | Date | null | undefined): stri
 
     const now = new Date()
     const diffInMs = now.getTime() - dateObj.getTime()
+
+    // Handle future dates
+    if (diffInMs < 0) {
+      return formatDate(date)
+    }
+
     const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
 
     if (diffInDays === 0) return 'Today'
     if (diffInDays === 1) return 'Yesterday'
-    if (diffInDays < 7) return `${diffInDays} days ago`
-    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`
-    if (diffInDays < 365) return `${Math.floor(diffInDays / 30)} months ago`
-    return `${Math.floor(diffInDays / 365)} years ago`
+
+    if (diffInDays < 7) {
+      return `${diffInDays} ${diffInDays === 1 ? 'day' : 'days'} ago`
+    }
+
+    if (diffInDays < 30) {
+      const weeks = Math.floor(diffInDays / 7)
+      return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`
+    }
+
+    if (diffInDays < 365) {
+      const months = Math.floor(diffInDays / 30.44) // Average days per month
+      return `${months} ${months === 1 ? 'month' : 'months'} ago`
+    }
+
+    const years = Math.floor(diffInDays / 365.25) // Account for leap years
+    return `${years} ${years === 1 ? 'year' : 'years'} ago`
   } catch (error) {
-    console.error('Error formatting relative date:', error)
+    logger.error('Error formatting relative date', error)
     return 'Invalid date'
   }
 }

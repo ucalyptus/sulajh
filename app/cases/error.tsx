@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
+import { logger } from '@/lib/logger'
 
 export default function CasesError({
   error,
@@ -13,7 +14,7 @@ export default function CasesError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error('Cases error:', error)
+    logger.error('Cases error', error, { component: 'CasesError', digest: error.digest })
   }, [error])
 
   return (

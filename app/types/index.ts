@@ -41,6 +41,21 @@ export interface DashboardCase {
   neutral: UserBasicInfo | null
 }
 
+// Assigned cases view type (for case managers and neutrals)
+export interface AssignedCaseView {
+  id: string
+  status: string
+  claimant: {
+    name?: string | null
+    email: string
+  }
+  respondent?: {
+    name?: string | null
+    email: string
+  } | null
+  createdAt: string
+}
+
 // Form types
 export interface NewCaseFormData {
   claimantRequest: string
