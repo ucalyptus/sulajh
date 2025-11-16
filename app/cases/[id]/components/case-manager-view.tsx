@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
+import { CaseWithRelations } from '@/app/types'
 
 interface CaseManagerViewProps {
-  caseData: any
+  caseData: CaseWithRelations
 }
 
 export function CaseManagerView({ caseData }: CaseManagerViewProps) {
@@ -35,8 +36,8 @@ export function CaseManagerView({ caseData }: CaseManagerViewProps) {
       toast.success(`Pre-proceeding call completed with ${party}`)
       router.refresh()
     } catch (error) {
-      console.error('Error updating pre-proceeding status:', error)
-      toast.error('Failed to update pre-proceeding status')
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update pre-proceeding status'
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }

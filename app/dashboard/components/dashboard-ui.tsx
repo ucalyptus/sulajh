@@ -2,9 +2,10 @@
 
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import { DashboardCase } from '@/app/types'
 
 interface DashboardUIProps {
-  initialCases: any[]
+  initialCases: DashboardCase[]
 }
 
 export function DashboardUI({ initialCases }: DashboardUIProps) {
