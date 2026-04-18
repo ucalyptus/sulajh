@@ -2,7 +2,14 @@ import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { Card } from '@/components/ui/card'
+import Link from 'next/link'
 import SignUpForm from '@/components/SignUpForm'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Sign Up',
+}
 
 interface SignUpPageProps {
   searchParams: { invitation?: string }
@@ -30,13 +37,28 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
   }
 
   return (
-    <div className="container mx-auto p-8">
-      <div className="max-w-md mx-auto">
-        <h1 className="text-3xl font-bold mb-8">
-          {invitationData ? 'Complete Your Registration' : 'Sign Up'}
-        </h1>
+    <div className="min-h-[60vh] flex items-center justify-center p-4">
+      <Card className="max-w-md w-full p-8">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold">
+            {invitationData ? 'Complete Your Registration' : 'Create an Account'}
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {invitationData
+              ? 'You\u0027ve been invited to respond to a case'
+              : 'Start resolving disputes with Sulajh'}
+          </p>
+        </div>
         <SignUpForm invitationData={invitationData} />
-      </div>
+        {!invitationData && (
+          <p className="text-center text-sm text-muted-foreground mt-6">
+            Already have an account?{' '}
+            <Link href="/auth/signin" className="text-primary hover:underline font-medium">
+              Sign in
+            </Link>
+          </p>
+        )}
+      </Card>
     </div>
   )
 } 

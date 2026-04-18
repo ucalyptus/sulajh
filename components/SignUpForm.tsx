@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { signIn } from 'next-auth/react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
@@ -37,7 +39,6 @@ export default function SignUpForm({ invitationData }: SignUpFormProps) {
           name, 
           email, 
           password,
-          // If there's an invitation, use RESPONDENT role, otherwise use selected role
           role: invitationData ? 'RESPONDENT' : role,
           invitationToken: invitationData?.token
         }),
@@ -49,7 +50,6 @@ export default function SignUpForm({ invitationData }: SignUpFormProps) {
         throw new Error(data.error || 'Failed to sign up')
       }
 
-      // Sign in the user
       const result = await signIn('credentials', {
         email,
         password,
@@ -59,14 +59,11 @@ export default function SignUpForm({ invitationData }: SignUpFormProps) {
       if (result?.error) {
         setError(result.error)
       } else {
-        // If there's an invitation, redirect to the case
-        // Otherwise, go to dashboard
         router.push(invitationData ? `/invite/${invitationData.token}` : '/dashboard')
         router.refresh()
       }
-    } catch (error) {
-      console.error('Sign up error:', error)
-      setError(error instanceof Error ? error.message : 'An error occurred during sign up')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred during sign up')
     } finally {
       setIsLoading(false)
     }
@@ -74,43 +71,50 @@ export default function SignUpForm({ invitationData }: SignUpFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-2">Name</label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="name">Full Name</Label>
+        <Input
+          id="name"
           type="text"
+          placeholder="Jane Doe"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full p-2 border rounded"
           required
+          autoComplete="name"
         />
       </div>
       
-      <div>
-        <label className="block text-sm font-medium mb-2">Email</label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
           type="email"
+          placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 border rounded"
           required
           disabled={!!invitationData}
+          autoComplete="email"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-2">Password</label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <Input
+          id="password"
           type="password"
+          placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 border rounded"
           required
+          autoComplete="new-password"
         />
+        <p className="text-xs text-muted-foreground">Must be at least 6 characters</p>
       </div>
 
       {!invitationData && (
-        <div>
-          <label className="block text-sm font-medium mb-2">Role</label>
+        <div className="space-y-2">
+          <Label>I am a…</Label>
           <Select
             value={role}
             onValueChange={(value: 'CLAIMANT' | 'RESPONDENT' | 'NEUTRAL') => setRole(value)}
@@ -119,16 +123,18 @@ export default function SignUpForm({ invitationData }: SignUpFormProps) {
               <SelectValue placeholder="Select your role" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="CLAIMANT">Claimant</SelectItem>
-              <SelectItem value="RESPONDENT">Respondent</SelectItem>
-              <SelectItem value="NEUTRAL">Neutral Party</SelectItem>
+              <SelectItem value="CLAIMANT">Claimant — I want to file a dispute</SelectItem>
+              <SelectItem value="RESPONDENT">Respondent — I received a dispute</SelectItem>
+              <SelectItem value="NEUTRAL">Neutral — I mediate disputes</SelectItem>
             </SelectContent>
           </Select>
         </div>
       )}
 
       {error && (
-        <p className="text-red-500 text-sm">{error}</p>
+        <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
+          {error}
+        </div>
       )}
 
       <Button
@@ -136,7 +142,7 @@ export default function SignUpForm({ invitationData }: SignUpFormProps) {
         className="w-full"
         disabled={isLoading}
       >
-        {isLoading ? 'Signing up...' : 'Sign Up'}
+        {isLoading ? 'Creating account…' : 'Create Account'}
       </Button>
     </form>
   )

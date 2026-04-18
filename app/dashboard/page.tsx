@@ -5,6 +5,13 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { formatDate } from '@/lib/utils'
 import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import StatusBadge from '@/components/StatusBadge'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Dashboard',
+}
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -13,7 +20,6 @@ export default async function DashboardPage() {
     redirect('/auth/signin')
   }
 
-  // Fetch user details including createdAt
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: {
@@ -28,7 +34,6 @@ export default async function DashboardPage() {
     redirect('/auth/signin')
   }
 
-  // Update cases query to show all relevant cases based on user role
   const cases = await prisma.case.findMany({
     where: {
       OR: [
@@ -54,11 +59,13 @@ export default async function DashboardPage() {
     }
   })
 
-  // Function to get role-specific empty state message
+  const openCases = cases.filter(c => !['CLOSED', 'DECISION_ISSUED'].includes(c.status))
+  const resolvedCases = cases.filter(c => ['CLOSED', 'DECISION_ISSUED'].includes(c.status))
+
   const getEmptyStateMessage = (role: string) => {
     switch (role) {
       case 'CLAIMANT':
-        return "You haven't filed any cases yet."
+        return "You haven't filed any cases yet. Ready to file your first claim?"
       case 'RESPONDENT':
         return "You haven't received any cases yet."
       case 'CASE_MANAGER':
@@ -71,67 +78,73 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto p-8">
-      <Card className="p-6 mb-8">
-        <div className="grid gap-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">User Information</h2>
-            <span className="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
-              {user.role}
-            </span>
-          </div>
-          <div className="grid gap-2">
-            <p><span className="font-medium">Name:</span> {user.name}</p>
-            <p><span className="font-medium">Email:</span> {user.email}</p>
-            <p><span className="font-medium">Member since:</span> {formatDate(user.createdAt)}</p>
-          </div>
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
+      {/* Welcome + user info */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold">Welcome back, {user.name || 'User'}</h1>
+          <p className="text-sm text-muted-foreground">
+            {user.email} · <span className="capitalize">{user.role.toLowerCase().replace('_', ' ')}</span> · Member since {formatDate(user.createdAt)}
+          </p>
         </div>
-      </Card>
-
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        {/* Only show File New Case button for CLAIMANT and REGISTRAR roles */}
         {(user.role === 'CLAIMANT' || user.role === 'REGISTRAR') && (
-          <Link 
-            href="/cases/new"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            File New Case
+          <Link href="/cases/new">
+            <Button>+ File New Case</Button>
           </Link>
         )}
       </div>
 
+      {/* Stats cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <Card className="p-5">
+          <p className="text-sm font-medium text-muted-foreground">Total Cases</p>
+          <p className="text-3xl font-bold mt-1">{cases.length}</p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-sm font-medium text-muted-foreground">Open</p>
+          <p className="text-3xl font-bold mt-1 text-primary">{openCases.length}</p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-sm font-medium text-muted-foreground">Resolved</p>
+          <p className="text-3xl font-bold mt-1 text-emerald-600">{resolvedCases.length}</p>
+        </Card>
+      </div>
+
+      {/* Cases list */}
+      <h2 className="text-lg font-semibold mb-4">Your Cases</h2>
       {cases.length === 0 ? (
-        <p className="text-gray-600">{getEmptyStateMessage(user.role)}</p>
+        <Card className="p-8 text-center">
+          <p className="text-muted-foreground mb-4">{getEmptyStateMessage(user.role)}</p>
+          {(user.role === 'CLAIMANT' || user.role === 'REGISTRAR') && (
+            <Link href="/cases/new">
+              <Button variant="outline">File a Claim</Button>
+            </Link>
+          )}
+        </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-3">
           {cases.map((case_) => (
             <Link 
               key={case_.id}
               href={`/cases/${case_.id}`}
-              className="block p-6 bg-white rounded-lg shadow hover:shadow-md transition-shadow"
+              className="block"
             >
-              <div className="flex justify-between items-start">
-                <div>
-                  <h2 className="text-lg font-semibold mb-2">
-                    {case_.claimantRequest 
-                      ? `${case_.claimantRequest.substring(0, 100)}...`
-                      : 'No details provided'
-                    }
-                  </h2>
-                  <p className="text-sm text-gray-600">
-                    Respondent: {case_.respondent?.email || 'Pending'}
-                  </p>
+              <Card className="p-5 hover:shadow-md transition-shadow">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="font-medium truncate">
+                      {case_.claimantRequest 
+                        ? case_.claimantRequest.substring(0, 100)
+                        : 'No details provided'
+                      }
+                    </h3>
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      Respondent: {case_.respondent?.email || 'Pending'} · {formatDate(case_.createdAt)}
+                    </p>
+                  </div>
+                  <StatusBadge status={case_.status} />
                 </div>
-                <div className="text-right">
-                  <span className="inline-block px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
-                    {case_.status}
-                  </span>
-                  <p className="text-sm text-gray-500 mt-2">
-                    {formatDate(case_.createdAt)}
-                  </p>
-                </div>
-              </div>
+              </Card>
             </Link>
           ))}
         </div>
