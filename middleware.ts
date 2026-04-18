@@ -6,11 +6,9 @@ export default withAuth(
     const token = req.nextauth.token
     const path = req.nextUrl.pathname
 
-    // Redirect paths based on user role
     if (token) {
       const role = token.role
 
-      // Protect routes based on role
       if (path.startsWith('/claimant') && role !== 'CLAIMANT') {
         return NextResponse.redirect(new URL('/dashboard', req.url))
       }
@@ -26,6 +24,9 @@ export default withAuth(
       if (path.startsWith('/registrar') && role !== 'REGISTRAR') {
         return NextResponse.redirect(new URL('/dashboard', req.url))
       }
+      if (path.startsWith('/admin') && role !== 'REGISTRAR') {
+        return NextResponse.redirect(new URL('/dashboard', req.url))
+      }
     }
 
     return NextResponse.next()
@@ -37,7 +38,6 @@ export default withAuth(
   }
 )
 
-// Specify which routes to protect
 export const config = {
   matcher: [
     '/dashboard/:path*',
@@ -45,6 +45,8 @@ export const config = {
     '/respondent/:path*',
     '/case-manager/:path*',
     '/neutral/:path*',
-    '/registrar/:path*'
+    '/registrar/:path*',
+    '/admin/:path*',
+    '/cases/:path*',
   ]
 } 
