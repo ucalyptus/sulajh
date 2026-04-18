@@ -3,16 +3,23 @@
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 export default function SignIn() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
+    setError('')
     try {
       const result = await signIn('credentials', {
         email,
@@ -21,48 +28,67 @@ export default function SignIn() {
       })
 
       if (result?.error) {
-        setError(result.error)
+        setError('Invalid email or password. Please try again.')
       } else {
-        router.push('/')
+        router.push('/dashboard')
       }
-    } catch (error) {
+    } catch {
       setError('An error occurred during sign in')
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    <div className="container mx-auto p-8">
-      <div className="max-w-md mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Sign In</h1>
+    <div className="min-h-[60vh] flex items-center justify-center p-4">
+      <Card className="max-w-md w-full p-8">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold">Welcome Back</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Sign in to your Sulajh account
+          </p>
+        </div>
         {error && (
-          <p className="text-red-500 mb-4">{error}</p>
+          <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md mb-4">
+            {error}
+          </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-2">Email</label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
               type="email"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border rounded"
               required
+              autoComplete="email"
             />
           </div>
-          <div>
-            <label className="block mb-2">Password</label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
               type="password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border rounded"
               required
+              autoComplete="current-password"
             />
           </div>
-          <Button type="submit" className="w-full">
-            Sign In
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? 'Signing in…' : 'Sign In'}
           </Button>
         </form>
-      </div>
+        <p className="text-center text-sm text-muted-foreground mt-6">
+          Don&apos;t have an account?{' '}
+          <Link href="/auth/signup" className="text-primary hover:underline font-medium">
+            Sign up
+          </Link>
+        </p>
+      </Card>
     </div>
   )
 } 
