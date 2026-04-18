@@ -1,11 +1,7 @@
-import { OpenAIStream, StreamingTextResponse } from 'ai'
-import OpenAI from 'openai'
+import { streamText } from 'ai'
+import { openai } from '@ai-sdk/openai'
 
 export const runtime = 'edge'
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-})
 
 type SystemRole = 'neutral' | 'platform' | 'judgment'
 
@@ -33,19 +29,15 @@ export async function POST(req: Request) {
       5. Provide specific, actionable recommendations`
     }
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages: [
-        { role: 'system', content: systemPrompts[role as SystemRole] || systemPrompts.platform },
-        { role: 'user', content: prompt }
-      ],
-      stream: true,
+    const result = streamText({
+      model: openai('gpt-4-turbo-preview'),
+      system: systemPrompts[role as SystemRole] || systemPrompts.platform,
+      prompt,
       temperature: 0.7,
-      max_tokens: 1000
+      maxOutputTokens: 1000,
     })
 
-    const stream = OpenAIStream(response)
-    return new StreamingTextResponse(stream)
+    return result.toTextStreamResponse()
   } catch (error) {
     console.error('Test GPT-4 Error:', error)
     return new Response('Error testing GPT-4', { status: 500 })

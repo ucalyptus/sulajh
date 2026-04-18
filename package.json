@@ -11,6 +11,8 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.53",
+    "@ai-sdk/react": "^3.0.170",
     "@hookform/resolvers": "^3.9.1",
     "@prisma/client": "^6.5.0",
     "@radix-ui/react-accordion": "^1.2.2",
@@ -42,8 +44,8 @@
     "@radix-ui/react-tooltip": "^1.1.6",
     "@supabase/supabase-js": "^2.39.0",
     "@types/bcryptjs": "^2.4.6",
-    "@types/nodemailer": "^6.4.17",
-    "ai": "^4.3.2",
+    "@types/nodemailer": "^8.0.0",
+    "ai": "^6.0.168",
     "autoprefixer": "^10.4.20",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
@@ -53,10 +55,10 @@
     "embla-carousel-react": "8.5.1",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
-    "next": "16.1.6",
+    "next": "16.2.4",
     "next-auth": "^4.24.11",
     "next-themes": "^0.4.4",
-    "nodemailer": "^6.9.16",
+    "nodemailer": "^8.0.5",
     "openai": "^4.24.1",
     "playwright": "^1.50.1",
     "react": "^18",
@@ -71,7 +73,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.6",
-    "zod": "^3.24.1"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
@@ -83,6 +85,9 @@
     "prisma": "^6.5.0",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
+  },
+  "overrides": {
+    "lodash": "^4.18.1"
   },
   "prisma": {
     "seed": "npx ts-node -T prisma/seed.ts"
