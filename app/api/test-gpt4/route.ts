@@ -1,5 +1,5 @@
 import { streamText } from 'ai'
-import { openai } from '@ai-sdk/openai'
+import { openrouter } from '@openrouter/ai-sdk-provider'
 
 export const runtime = 'edge'
 
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     }
 
     const result = streamText({
-      model: openai('gpt-4-turbo-preview'),
+      model: openrouter('google/gemma-4-26b-a4b-it'),
       system: systemPrompts[role as SystemRole] || systemPrompts.platform,
       prompt,
       temperature: 0.7,
