@@ -83,7 +83,7 @@ export async function POST(
       }
     })
 
-    const parties = [case_.claimant, case_.respondent].filter(Boolean)
+    const parties = [case_.claimant, case_.respondent].filter((p): p is NonNullable<typeof p> => p !== null)
     await Promise.all(
       parties.map(party => 
         sendEmail({

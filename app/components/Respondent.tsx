@@ -1,6 +1,6 @@
 'use client'
 
-import { useCompletion } from 'ai/react'
+import { useCompletion } from '@ai-sdk/react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useSearchParams, useRouter } from 'next/navigation'
@@ -26,7 +26,7 @@ export function Respondent() {
     console.log('Response submitted for case:', caseId, aiResponse)
     // Redirect to neutral page with the case ID
     router.push(`/neutral?caseId=${caseId}`)
-    localStorage.setItem(`case_${caseId}_response`, aiResponse)
+    localStorage.setItem(`case_${caseId}_response`, aiResponse ?? '')
   }
 
   return (

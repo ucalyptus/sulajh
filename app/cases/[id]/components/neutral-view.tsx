@@ -84,7 +84,7 @@ export function NeutralView({ caseData }: NeutralViewProps) {
         </div>
         
         {(caseData.status === 'DECISION_ISSUED' || judgment) ? (
-          <CaseJudgment judgment={judgment || caseData.finalDecision} />
+          <CaseJudgment judgment={judgment || caseData.finalDecision || ''} />
         ) : (
           <div className="text-center text-gray-500 py-8 bg-gray-50 rounded-lg">
             <p>Click "Generate Judgment" to analyze the case and provide a decision</p>

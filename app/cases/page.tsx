@@ -5,7 +5,6 @@ import Link from "next/link"
 import { Card } from "@/components/ui/card"
 import { formatDistanceToNow } from "date-fns"
 import { prisma } from "@/lib/prisma"
-import type { Case } from "@/types/case"
 
 const getEmptyStateMessage = (role: string) => {
   switch (role) {
@@ -82,7 +81,7 @@ export default async function CasesPage() {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {cases.map((case_: Case) => (
+          {cases.map((case_) => (
             <Link key={case_.id} href={`/cases/${case_.id}`}>
               <Card className="p-6 hover:shadow-lg transition-shadow">
                 <div className="flex justify-between items-start">

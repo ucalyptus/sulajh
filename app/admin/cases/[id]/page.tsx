@@ -13,6 +13,7 @@ async function getCaseWithDetails(id: string) {
           id: true,
           name: true,
           email: true,
+          role: true,
         },
       },
       respondent: {
@@ -20,6 +21,7 @@ async function getCaseWithDetails(id: string) {
           id: true,
           name: true,
           email: true,
+          role: true,
         },
       },
       caseManager: {
@@ -27,6 +29,7 @@ async function getCaseWithDetails(id: string) {
           id: true,
           name: true,
           email: true,
+          role: true,
         },
       },
       neutral: {
@@ -34,6 +37,7 @@ async function getCaseWithDetails(id: string) {
           id: true,
           name: true,
           email: true,
+          role: true,
         },
       },
     },
@@ -48,6 +52,7 @@ async function getAvailableUsers() {
         id: true,
         name: true,
         email: true,
+        role: true,
       },
     }),
     prisma.user.findMany({
@@ -56,6 +61,7 @@ async function getAvailableUsers() {
         id: true,
         name: true,
         email: true,
+        role: true,
       },
     }),
   ])

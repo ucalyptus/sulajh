@@ -4,7 +4,7 @@ import { useCompletion } from '@ai-sdk/react'
 import { Button } from '@/components/ui/button'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { CaseState } from '@/types'
+import { CaseState } from '@/app/types'
 
 export function Neutral() {
   const router = useRouter()

@@ -8,17 +8,17 @@ interface Case {
   id: string
   status: string
   claimant: {
-    name?: string
+    name?: string | null
     email: string
   }
   respondent?: {
-    name?: string
+    name?: string | null
     email: string
-  }
+  } | null
   caseManager?: {
-    name?: string
+    name?: string | null
     email: string
-  }
+  } | null
   createdAt: string
 }
 

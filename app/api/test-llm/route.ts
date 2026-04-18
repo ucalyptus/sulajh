@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       5. Provide specific, actionable recommendations`
     }
 
-    const fullPrompt = `${systemPrompts[role] || systemPrompts.platform}
+    const fullPrompt = `${systemPrompts[role as keyof typeof systemPrompts] || systemPrompts.platform}
 
     Test request: ${prompt}`
 

@@ -43,14 +43,16 @@ async function getCaseDetails(id: string) {
         select: {
           id: true,
           name: true,
-          email: true
+          email: true,
+          role: true
         }
       },
       neutral: {
         select: {
           id: true,
           name: true,
-          email: true
+          email: true,
+          role: true
         }
       }
     }
@@ -69,32 +71,37 @@ export default async function CasePage({ params }: { params: { id: string } }) {
     where: {
       id: params.id
     },
-    select: {
-      id: true,
-      claimantRequest: true,
-      respondentResponse: true,
-      status: true,
-      createdAt: true,
-      claimantId: true,
-      respondentId: true,
-      caseManagerId: true,
-      neutralId: true,
-      finalDecision: true,
+    include: {
+      claimant: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        }
+      },
       respondent: {
         select: {
-          email: true
+          id: true,
+          name: true,
+          email: true,
+          role: true,
         }
       },
       caseManager: {
         select: {
+          id: true,
           name: true,
-          email: true
+          email: true,
+          role: true,
         }
       },
       neutral: {
         select: {
+          id: true,
           name: true,
-          email: true
+          email: true,
+          role: true,
         }
       },
       invitations: {
@@ -106,11 +113,6 @@ export default async function CasePage({ params }: { params: { id: string } }) {
         },
         take: 1
       },
-      claimant: {
-        select: {
-          email: true
-        }
-      }
     }
   })
 
