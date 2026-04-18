@@ -4,7 +4,7 @@ import { useCompletion } from '@ai-sdk/react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useState } from 'react'
-import { CaseState } from '@/types'
+import { CaseState } from '@/app/types'
 import { useRouter } from 'next/navigation'
 
 export function Claimant() {
@@ -18,11 +18,11 @@ export function Claimant() {
     const newCase: CaseState = {
       id: caseId,
       status: 'claimant_submitted',
-      claimantRequest: response
+      claimantRequest: response ?? undefined
     }
     // Here you would typically save the case to a database
     console.log('New case created:', newCase)
-    localStorage.setItem(`case_${caseId}_claim`, response)
+    localStorage.setItem(`case_${caseId}_claim`, response ?? '')
     router.push(`/platform?caseId=${caseId}`)
   }
 

@@ -36,9 +36,9 @@ export async function POST(
     if (updatedCase.caseManager) {
       await resend.emails.send({
         from: 'Dispute Resolution <onboarding@resend.dev>',
-        to: process.env.NODE_ENV === 'development' 
+        to: (process.env.NODE_ENV === 'development' 
           ? process.env.VERIFIED_EMAIL 
-          : updatedCase.caseManager.email,
+          : updatedCase.caseManager.email) || '',
         subject: `New Case Assignment - Case #${updatedCase.id}`,
         html: `You have been assigned as the Case Manager for Case #${updatedCase.id}`
       })
@@ -47,9 +47,9 @@ export async function POST(
     if (updatedCase.neutral) {
       await resend.emails.send({
         from: 'Dispute Resolution <onboarding@resend.dev>',
-        to: process.env.NODE_ENV === 'development' 
+        to: (process.env.NODE_ENV === 'development' 
           ? process.env.VERIFIED_EMAIL 
-          : updatedCase.neutral.email,
+          : updatedCase.neutral.email) || '',
         subject: `New Case Assignment - Case #${updatedCase.id}`,
         html: `You have been assigned as the Neutral for Case #${updatedCase.id}`
       })

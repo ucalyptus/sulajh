@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useCompletion } from 'ai/react'
+import { useCompletion } from '@ai-sdk/react'
 import ReactMarkdown from 'react-markdown'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -19,14 +19,6 @@ export default function TestLLM() {
   
   const { completion, complete, isLoading } = useCompletion({
     api: model === 'ollama' ? '/api/test-llm' : '/api/test-gpt4',
-    onResponse: (response) => {
-      if (isFirstResponse) {
-        setFormattedResponse('')
-        responseBuffer.current = ''
-        lastChunkRef.current = ''
-        setIsFirstResponse(false)
-      }
-    },
     onFinish: () => {
       setIsFirstResponse(true)
       if (model === 'gpt4') {
@@ -41,6 +33,7 @@ export default function TestLLM() {
     setFormattedResponse('')
     responseBuffer.current = ''
     lastChunkRef.current = ''
+    setIsFirstResponse(false)
     try {
       await complete(JSON.stringify({
         prompt: testPrompt,

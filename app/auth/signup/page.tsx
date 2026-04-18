@@ -17,7 +17,7 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
 
   let invitationData = null
   if (searchParams.invitation) {
-    const invitation = await prisma.CaseInvitation.findUnique({
+    const invitation = await prisma.caseInvitation.findUnique({
       where: { token: searchParams.invitation },
       select: { email: true }
     })
