@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server'
+import { streamText } from 'ai'
+import { openrouter } from '@openrouter/ai-sdk-provider'
 
 export const runtime = 'edge'
 
@@ -26,44 +27,17 @@ export async function POST(req: Request) {
       5. Provide specific, actionable recommendations`
     }
 
-    const fullPrompt = `${systemPrompts[role as keyof typeof systemPrompts] || systemPrompts.platform}
-
-    Test request: ${prompt}`
-
-    const response = await fetch('http://127.0.0.1:11434/api/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama3.2',
-        prompt: fullPrompt,
-        stream: true,
-        options: {
-          temperature: 0.1,
-          top_k: 10,
-          top_p: 0.8,
-          repeat_penalty: 1.5,
-          mirostat: 2,
-          mirostat_tau: 3,
-          mirostat_eta: 0.1,
-          num_ctx: 4096,
-          num_thread: 8,
-          stop: ["\n\n\n", "</response>"],
-          num_predict: 1000,
-        }
-      })
+    const result = streamText({
+      model: openrouter('google/gemma-4-26b-a4b-it'),
+      system: systemPrompts[role as keyof typeof systemPrompts] || systemPrompts.platform,
+      prompt,
+      temperature: 0.7,
+      maxOutputTokens: 1000,
     })
 
-    return new Response(response.body, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
-    })
+    return result.toTextStreamResponse()
   } catch (error) {
     console.error('Test LLM Error:', error)
-    return new NextResponse('Error testing LLM', { status: 500 })
+    return new Response('Error testing LLM', { status: 500 })
   }
 } 
