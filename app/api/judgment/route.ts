@@ -1,30 +1,16 @@
-import { NextResponse } from 'next/server'
-
-const TOGETHER_API_KEY = process.env.TOGETHER_API_KEY
+import { streamText } from 'ai'
+import { openrouter } from '@openrouter/ai-sdk-provider'
 
 export async function POST(req: Request) {
   const { prompt } = await req.json()
-  
-  const response = await fetch('https://api.together.xyz/inference', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${TOGETHER_API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
-      prompt: prompt,
-      max_tokens: 1024,
-      temperature: 0.7,
-      stream: true
-    })
+
+  const result = streamText({
+    model: openrouter('google/gemma-4-26b-a4b-it'),
+    system: 'You are an experienced arbitrator. Analyze the dispute carefully, consider fairness and applicable norms, evaluate evidence objectively, and provide a clear, reasoned judgment with specific recommendations.',
+    prompt,
+    temperature: 0.7,
+    maxOutputTokens: 1024,
   })
 
-  return new Response(response.body, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
-    },
-  })
+  return result.toTextStreamResponse()
 } 
