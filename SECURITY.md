@@ -1,21 +1,45 @@
 # Security Policy
 
+## About Sulajh
+
+Sulajh is an AI-assisted mediation platform. It handles sensitive case data, personal information, and legal communications. We take security seriously and appreciate responsible disclosure.
+
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+This project is in active development. Only the latest deployment on the `main` branch receives security updates.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| Version | Supported |
+| ------- | --------- |
+| `main`  | ✅        |
+| older commits | ❌  |
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+**Do not open a public GitHub issue for security vulnerabilities.**
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Please report vulnerabilities by emailing: **forkbabu@gmail.com**
+
+Include:
+- A clear description of the vulnerability
+- Steps to reproduce
+- Potential impact
+- Any suggested fix (optional)
+
+You can expect an acknowledgement within **48 hours** and a status update within **7 days**.
+
+## Scope
+
+Areas of particular concern given the nature of this platform:
+
+- Authentication and session management (`/app/auth`, `next-auth`)
+- Case data access controls (claimant / neutral / registrar roles)
+- AI prompt injection via user-submitted case content
+- File upload handling
+- API route authorization (`/app/api`)
+
+## Out of Scope
+
+- Rate limiting / brute-force on non-sensitive endpoints
+- Self-XSS
+- Clickjacking on pages without sensitive actions
+- Social engineering
