@@ -30,8 +30,8 @@ export const Route = createFileRoute('/auth/signup')({
     invitation: (search.invitation as string) || undefined,
   }),
   component: SignUpPage,
-  loader: ({ context, search }) =>
-    getSignUpData({ data: { invitation: search.invitation } }),
+  loader: ({ search }) =>
+    getSignUpData({ data: { invitation: search?.invitation } }),
 })
 
 function SignUpPage() {

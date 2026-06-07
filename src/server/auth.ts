@@ -1,8 +1,10 @@
 import { createServerFn } from '@tanstack/react-start'
 import { prisma } from '@/lib/prisma'
-import { compare, hash } from 'bcryptjs'
+import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { getCookie, setCookie, deleteCookie } from '@/src/server/cookies'
+
+const { compare, hash } = bcrypt
 
 const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'sulajh-secret-key'
 const TOKEN_COOKIE = 'sulajh-session'
