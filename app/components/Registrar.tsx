@@ -2,12 +2,12 @@
 
 import { useCompletion } from '@ai-sdk/react'
 import { Button } from '@/components/ui/button'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useRouter, useSearch } from '@tanstack/react-router'
 
 export function Registrar() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const caseId = searchParams.get('caseId')
+  const searchParams = useSearch({ strict: false }) as Record<string, string>
+  const caseId = searchParams['caseId'] || null
   const { complete } = useCompletion({ api: '/api/registrar' })
 
   const handleAssignCaseManager = async () => {
@@ -16,7 +16,7 @@ export function Registrar() {
     // Here you would typically update the case in a database
     console.log('Case manager assigned for case:', caseId, response)
     // Redirect to case manager page
-    router.push(`/case-manager?caseId=${caseId}`)
+    router.navigate({ to: '/case-manager', search: { caseId } })
   }
 
   return (

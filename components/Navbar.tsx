@@ -1,8 +1,8 @@
 'use client'
 
-import Link from 'next/link'
-import { useSession } from 'next-auth/react'
-import { usePathname } from 'next/navigation'
+import { Link } from '@tanstack/react-router'
+
+import { useLocation } from '@tanstack/react-router'
 import { authOptions } from '@/lib/auth'
 
 export default function Navbar() {

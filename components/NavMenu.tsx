@@ -1,18 +1,24 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useSession, signOut } from 'next-auth/react'
-import { useState } from 'react'
+import { Link, useLocation, useRouter } from '@tanstack/react-router'
+import { useState, useEffect } from 'react'
+import { getSession, signOut } from '@/src/server/auth'
+import type { SessionUser } from '@/src/server/auth'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 export default function NavMenu() {
-  const { data: session } = useSession()
-  const pathname = usePathname()
+  const [session, setSession] = useState<SessionUser | null>(null)
+  const location = useLocation()
+  const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const pathname = location.pathname
 
-  const role = (session?.user as { role?: string })?.role
+  useEffect(() => {
+    getSession().then(setSession)
+  }, [pathname])
+
+  const role = session?.role
 
   const navLinks = session
     ? [
@@ -28,23 +34,23 @@ export default function NavMenu() {
     : []
 
   const handleSignOut = async () => {
-    await signOut({ redirect: true, callbackUrl: '/' })
+    await signOut()
+    setSession(null)
+    router.navigate({ to: '/' })
   }
 
   return (
     <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <span className="font-bold text-xl text-primary">⚖️ Sulajh</span>
         </Link>
 
-        {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
-              href={link.href}
+              to={link.href}
               className={cn(
                 'px-3 py-1.5 rounded-md text-sm font-medium transition-colors',
                 pathname === link.href || pathname.startsWith(link.href + '/')
@@ -57,12 +63,11 @@ export default function NavMenu() {
           ))}
         </div>
 
-        {/* Right side */}
         <div className="hidden md:flex items-center gap-2">
           {session ? (
             <>
               <span className="text-xs text-muted-foreground mr-1">
-                {session.user?.email}
+                {session.email}
               </span>
               <Button size="sm" variant="ghost" onClick={handleSignOut}>
                 Sign Out
@@ -70,17 +75,16 @@ export default function NavMenu() {
             </>
           ) : (
             <>
-              <Link href="/auth/signin">
+              <Link to="/auth/signin">
                 <Button size="sm" variant="ghost">Sign In</Button>
               </Link>
-              <Link href="/auth/signup">
+              <Link to="/auth/signup">
                 <Button size="sm">Sign Up</Button>
               </Link>
             </>
           )}
         </div>
 
-        {/* Mobile hamburger */}
         <button
           className="md:hidden p-2 rounded-md hover:bg-accent"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -96,13 +100,12 @@ export default function NavMenu() {
         </button>
       </div>
 
-      {/* Mobile menu */}
       {mobileOpen && (
         <div className="md:hidden border-t bg-background px-4 py-3 space-y-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
-              href={link.href}
+              to={link.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
                 'block px-3 py-2 rounded-md text-sm font-medium',
@@ -117,7 +120,7 @@ export default function NavMenu() {
           <div className="pt-2 border-t mt-2">
             {session ? (
               <>
-                <p className="px-3 py-1 text-xs text-muted-foreground">{session.user?.email}</p>
+                <p className="px-3 py-1 text-xs text-muted-foreground">{session.email}</p>
                 <button
                   onClick={handleSignOut}
                   className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent"
@@ -127,10 +130,10 @@ export default function NavMenu() {
               </>
             ) : (
               <>
-                <Link href="/auth/signin" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent">
+                <Link to="/auth/signin" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent">
                   Sign In
                 </Link>
-                <Link href="/auth/signup" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded-md text-sm font-medium text-primary hover:bg-primary/10">
+                <Link to="/auth/signup" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded-md text-sm font-medium text-primary hover:bg-primary/10">
                   Sign Up
                 </Link>
               </>

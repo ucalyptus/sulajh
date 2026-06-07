@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { signIn } from 'next-auth/react'
+import { signUp } from '@/src/server/auth'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 type InvitationData = {
@@ -32,36 +32,16 @@ export default function SignUpForm({ invitationData }: SignUpFormProps) {
     setError('')
 
     try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          name, 
-          email, 
+      await signUp({
+        data: {
+          name,
+          email,
           password,
           role: invitationData ? 'RESPONDENT' : role,
-          invitationToken: invitationData?.token
-        }),
+          invitationToken: invitationData?.token,
+        },
       })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to sign up')
-      }
-
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      })
-
-      if (result?.error) {
-        setError(result.error)
-      } else {
-        router.push(invitationData ? `/invite/${invitationData.token}` : '/dashboard')
-        router.refresh()
-      }
+      router.navigate({ to: '/dashboard' })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during sign up')
     } finally {

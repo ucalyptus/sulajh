@@ -2,12 +2,12 @@
 
 import { useCompletion } from '@ai-sdk/react'
 import { Button } from '@/components/ui/button'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useRouter, useSearch } from '@tanstack/react-router'
 
 export function Platform() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const caseId = searchParams.get('caseId')
+  const searchParams = useSearch({ strict: false }) as Record<string, string>
+  const caseId = searchParams['caseId'] || null
   const { complete } = useCompletion({ api: '/api/platform' })
 
   const handleNotifyRegistrar = async () => {
@@ -16,7 +16,7 @@ export function Platform() {
     // Here you would typically update the case in a database
     console.log('Registrar notified for case:', caseId, response)
     // Redirect to registrar page with the case ID
-    router.push(`/registrar?caseId=${caseId}`)
+    router.navigate({ to: '/registrar', search: { caseId } })
   }
 
   return (

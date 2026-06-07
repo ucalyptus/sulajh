@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 
@@ -34,7 +34,7 @@ export function RespondentResponseForm({ caseId, token }: RespondentResponseForm
       }
 
       toast.success('Response submitted successfully')
-      router.push(`/cases/${caseId}`)
+      router.navigate({ to: '/cases/$id', params: { id: caseId } })
     } catch (error) {
       console.error('Error submitting response:', error)
       toast.error('Failed to submit response')

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@tanstack/react-router'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -141,7 +141,7 @@ export function NewCaseForm() {
         throw new Error(data.error || 'Failed to submit claim')
       }
 
-      router.push(`/cases/${data.id}`)
+      router.navigate({ to: '/cases/$id', params: { id: data.id } })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to submit claim')
     } finally {

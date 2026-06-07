@@ -3,13 +3,13 @@
 import { useCompletion } from '@ai-sdk/react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useRouter, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 
 export function Respondent() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const caseId = searchParams.get('caseId')
+  const searchParams = useSearch({ strict: false }) as Record<string, string>
+  const caseId = searchParams['caseId'] || null
   const [response, setResponse] = useState('')
   const { complete } = useCompletion({ api: '/api/respondent' })
 
@@ -25,7 +25,7 @@ export function Respondent() {
     // Here you would typically update the case in a database
     console.log('Response submitted for case:', caseId, aiResponse)
     // Redirect to neutral page with the case ID
-    router.push(`/neutral?caseId=${caseId}`)
+    router.navigate({ to: '/neutral', search: { caseId } })
     localStorage.setItem(`case_${caseId}_response`, aiResponse ?? '')
   }
 

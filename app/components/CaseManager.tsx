@@ -2,12 +2,12 @@
 
 import { useCompletion } from '@ai-sdk/react'
 import { Button } from '@/components/ui/button'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useRouter, useSearch } from '@tanstack/react-router'
 
 export function CaseManager() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const caseId = searchParams.get('caseId')
+  const searchParams = useSearch({ strict: false }) as Record<string, string>
+  const caseId = searchParams['caseId'] || null
   const { complete } = useCompletion({ api: '/api/case-manager' })
 
   const handlePreProceeding = async () => {
@@ -16,7 +16,7 @@ export function CaseManager() {
     // Here you would typically update the case in a database
     console.log('Pre-proceeding completed for case:', caseId, response)
     // Redirect to respondent page with the case ID
-    router.push(`/respondent?caseId=${caseId}`)
+    router.navigate({ to: '/respondent', search: { caseId } })
   }
 
   return (
