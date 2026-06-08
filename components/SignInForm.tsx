@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { signIn } from '@/src/server/auth'
+import { useRouter } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 
 export default function SignInForm() {
@@ -31,8 +31,8 @@ export default function SignInForm() {
         setError(result.error)
       } else {
         console.log('Sign in successful')
-        router.push('/dashboard')
-        router.refresh()
+        router.navigate({ to: '/dashboard' })
+        router.invalidate()
       }
     } catch (error) {
       console.error('Sign in error:', error)

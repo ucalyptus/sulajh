@@ -3,7 +3,7 @@
 import { User, Case } from '@prisma/client'
 import { CaseDetails } from '@/components/CaseDetails'
 import { CaseAssignment } from '@/components/admin/CaseAssignment'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@tanstack/react-router'
 
 type CaseWithParties = Case & {
   claimant: User
@@ -38,7 +38,7 @@ export function CasePageContent({
             caseManagers={caseManagers}
             neutrals={neutrals}
             onAssign={() => {
-              router.refresh()
+              router.invalidate()
             }}
           />
         </div>

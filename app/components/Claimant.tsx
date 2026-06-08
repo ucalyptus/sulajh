@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useState } from 'react'
 import { CaseState } from '@/app/types'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@tanstack/react-router'
 
 export function Claimant() {
   const router = useRouter()
@@ -23,7 +23,7 @@ export function Claimant() {
     // Here you would typically save the case to a database
     console.log('New case created:', newCase)
     localStorage.setItem(`case_${caseId}_claim`, response ?? '')
-    router.push(`/platform?caseId=${caseId}`)
+    router.navigate({ to: '/platform', search: { caseId } })
   }
 
   return (

@@ -8,9 +8,13 @@
 # testing
 /coverage
 
-# next.js
+# next.js (legacy)
 /.next/
 /out/
+
+# tanstack start / vite
+/dist/
+/.output/
 
 # production
 /build

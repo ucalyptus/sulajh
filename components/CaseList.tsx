@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { Link } from '@tanstack/react-router'
 import { Case, User, UserRole } from '@prisma/client'
 
 type CaseWithParties = Case & {
@@ -31,7 +31,7 @@ export function CaseList({ cases, userRole }: CaseListProps) {
               </p>
             </div>
             <Link
-              href={`/cases/${case_.id}`}
+              to={`/cases/${case_.id}`}
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
             >
               View Details

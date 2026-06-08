@@ -2,14 +2,14 @@
 
 import { useCompletion } from '@ai-sdk/react'
 import { Button } from '@/components/ui/button'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useRouter, useSearch } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { CaseState } from '@/app/types'
 
 export function Neutral() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const caseId = searchParams.get('caseId')
+  const searchParams = useSearch({ strict: false }) as Record<string, string>
+  const caseId = searchParams['caseId'] || null
   const [caseData, setCaseData] = useState<CaseState | null>(null)
   const [decision, setDecision] = useState('')
   

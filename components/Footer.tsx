@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from '@tanstack/react-router'
 
 export default function Footer() {
   return (
@@ -14,9 +14,9 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-2 text-sm">Platform</h4>
             <ul className="space-y-1 text-sm text-muted-foreground">
-              <li><Link href="/cases/new" className="hover:text-foreground transition-colors">File a Claim</Link></li>
-              <li><Link href="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link></li>
-              <li><Link href="/auth/signin" className="hover:text-foreground transition-colors">Sign In</Link></li>
+              <li><Link to="/cases/new" className="hover:text-foreground transition-colors">File a Claim</Link></li>
+              <li><Link to="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link></li>
+              <li><Link to="/auth/signin" className="hover:text-foreground transition-colors">Sign In</Link></li>
             </ul>
           </div>
           <div>
