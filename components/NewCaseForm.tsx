@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from '@tanstack/react-router'
+import { createCase } from '@/src/server/cases'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -77,71 +78,21 @@ export function NewCaseForm() {
     setIsSubmitting(true)
 
     try {
-      // Upload evidence files first if any
-      let evidenceUrls: string[] = []
-      if (evidenceFiles) {
-        const formData = new FormData()
-        Array.from(evidenceFiles).forEach((file) => {
-          formData.append('files', file)
-        })
-        const uploadRes = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        })
-        if (!uploadRes.ok) throw new Error('Failed to upload evidence files')
-        evidenceUrls = await uploadRes.json()
+      if (!claimDetails.trim()) {
+        throw new Error('Claim details are required')
+      }
+      if (!respondentEmail.trim()) {
+        throw new Error('Respondent email is required')
       }
 
-      const res = await fetch('/api/cases', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          // Claimant Information
+      const result = await createCase({
+        data: {
           claimantRequest: claimDetails,
-          claimantPhone,
-          claimantAddress,
-          preferredContact,
-          accountNumber,
-
-          // Respondent Information
           respondentEmail,
-          respondentPhone,
-          respondentAddress,
-          relationship,
-
-          // Dispute Details
-          incidentDate,
-          incidentLocation,
-          disputeAmount: parseFloat(disputeAmount) || null,
-          disputeCategory,
-          desiredResolution,
-
-          // Evidence
-          evidenceFiles: evidenceUrls,
-          evidenceNotes,
-          witnesses,
-
-          // Previous Resolution Attempts
-          priorContact,
-          priorContactDates,
-          priorMethods,
-          priorResults,
-
-          // Declaration
-          truthStatement,
-          signature,
-        }),
+        },
       })
 
-      const data = await res.json()
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to submit claim')
-      }
-
-      router.navigate({ to: '/cases/$id', params: { id: data.id } })
+      router.navigate({ to: '/cases/$id', params: { id: result.id } })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to submit claim')
     } finally {
