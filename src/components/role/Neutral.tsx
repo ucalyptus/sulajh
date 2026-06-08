@@ -4,7 +4,7 @@ import { useCompletion } from '@ai-sdk/react'
 import { Button } from '@/components/ui/button'
 import { useRouter, useSearch } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
-import { CaseState } from '@/app/types'
+import { CaseState } from '@/src/types'
 
 export function Neutral() {
   const router = useRouter()

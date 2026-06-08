@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getSession } from '@/src/server/auth'
-import { Respondent } from '@/app/components'
+import { Respondent } from '@/src/components/role'
 import { Suspense } from 'react'
 
 const requireRole = createServerFn({ method: 'GET' }).handler(async () => {
