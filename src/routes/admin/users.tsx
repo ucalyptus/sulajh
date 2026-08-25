@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
-import { prisma } from '@/lib/prisma'
+import { getAdminUsers, type AdminUserRow } from '@/src/server/admin'
 import {
   useReactTable,
   getCoreRowModel,
@@ -82,20 +81,10 @@ const styles = stylex.create({
   },
 })
 
-export interface UserRow {
-  id: string
-  name: string | null
-  email: string
-  role: string
-  createdAt: Date
-}
+type UserRow = AdminUserRow
 
-const getUsers = createServerFn({ method: 'GET' }).handler(async (): Promise<UserRow[]> => {
-  return prisma.user.findMany({
-    select: { id: true, name: true, email: true, role: true, createdAt: true },
-    orderBy: { createdAt: 'desc' },
-  })
-})
+// Authorized in src/server/admin.ts (REGISTRAR-only).
+const getUsers = getAdminUsers
 
 const columnHelper = createColumnHelper<UserRow>()
 

@@ -5,39 +5,76 @@ import bcrypt from 'bcryptjs'
 import { randomBytes } from 'crypto'
 import { Resend } from 'resend'
 import { generateUserInvitationEmail } from '@/lib/email-templates'
+import { formatDate } from '@/lib/utils'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-export const getAdminCases = createServerFn({ method: 'GET' }).handler(async () => {
-  const session = await getSession()
-  if (!session || session.role !== 'REGISTRAR') throw new Error('Unauthorized')
+export interface AdminCaseRow {
+  id: string
+  status: string
+  createdAt: string
+  claimant: AdminPartyRow | null
+  respondent: AdminPartyRow | null
+  caseManager: AdminPartyRow | null
+  neutral: AdminPartyRow | null
+}
 
-  return prisma.case.findMany({
-    include: {
-      claimant: { select: { id: true, name: true, email: true } },
-      respondent: { select: { id: true, name: true, email: true } },
-      caseManager: { select: { id: true, name: true, email: true } },
-      neutral: { select: { id: true, name: true, email: true } },
-    },
-    orderBy: { createdAt: 'desc' },
-  })
-})
+export interface AdminUserRow {
+  id: string
+  name: string | null
+  email: string
+  role: string
+  createdAt: string
+}
 
-export const getAdminUsers = createServerFn({ method: 'GET' }).handler(async () => {
-  const session = await getSession()
-  if (!session || session.role !== 'REGISTRAR') throw new Error('Unauthorized')
+interface AdminPartyRow {
+  id: string
+  name: string | null
+  email: string
+}
 
-  return prisma.user.findMany({
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      createdAt: true,
-    },
-    orderBy: { createdAt: 'desc' },
-  })
-})
+export const getAdminCases = createServerFn({ method: 'GET' }).handler(
+  async (): Promise<AdminCaseRow[]> => {
+    const session = await getSession()
+    if (!session || session.role !== 'REGISTRAR') throw new Error('Unauthorized')
+
+    const cases = await prisma.case.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        status: true,
+        createdAt: true,
+        claimant: { select: { id: true, name: true, email: true } },
+        respondent: { select: { id: true, name: true, email: true } },
+        caseManager: { select: { id: true, name: true, email: true } },
+        neutral: { select: { id: true, name: true, email: true } },
+      },
+    })
+
+    return cases.map((case_) => ({
+      ...case_,
+      createdAt: formatDate(case_.createdAt),
+    }))
+  }
+)
+
+export const getAdminUsers = createServerFn({ method: 'GET' }).handler(
+  async (): Promise<AdminUserRow[]> => {
+    const session = await getSession()
+    if (!session || session.role !== 'REGISTRAR') throw new Error('Unauthorized')
+
+    const users = await prisma.user.findMany({
+      select: { id: true, name: true, email: true, role: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
+    })
+
+    return users.map((user) => ({
+      ...user,
+      createdAt: formatDate(user.createdAt),
+    }))
+  }
+)
+
 
 export const updateUserRole = createServerFn({ method: 'POST' })
   .validator((d: { userId: string; role: string }) => d)

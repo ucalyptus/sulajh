@@ -43,18 +43,9 @@ export default function SignInForm() {
     setError('')
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false
-      })
-
-      if (result?.error) {
-        setError(result.error)
-      } else {
-        router.navigate({ to: '/dashboard' })
-        router.invalidate()
-      }
+      await signIn({ data: { email, password } })
+      router.navigate({ to: '/dashboard' })
+      router.invalidate()
     } catch (err: any) {
       setError('An error occurred during sign in')
     } finally {

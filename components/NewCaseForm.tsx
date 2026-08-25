@@ -74,6 +74,10 @@ const styles = stylex.create({
   fileInput: {
     cursor: "pointer",
   },
+  datePopover: {
+    width: "auto",
+    padding: 0,
+  },
 })
 
 const disputeCategories = [
@@ -161,11 +165,7 @@ export function NewCaseForm() {
         }
       })
 
-      if (result.error) {
-        setError(result.error)
-      } else {
-        router.navigate({ to: '/cases/$id', params: { id: String(result.id) } })
-      }
+      router.navigate({ to: '/cases/$id', params: { id: String(result.id) } })
     } catch (err: any) {
       setError(err?.message || 'An error occurred while creating the case')
     } finally {
@@ -294,7 +294,7 @@ export function NewCaseForm() {
                   {incidentDate ? format(incidentDate, "PPP") : "Pick a date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent style={{ width: 'auto', padding: 0 }}>
+              <PopoverContent style={styles.datePopover}>
                 <Calendar
                   mode="single"
                   selected={incidentDate}

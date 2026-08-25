@@ -79,7 +79,8 @@ export function CaseList({ cases }: CaseListProps) {
               </p>
             </div>
             <Link
-              to={`/cases/${case_.id}`}
+              to="/cases/$id"
+              params={{ id: case_.id }}
               {...stylex.props(styles.button)}
             >
               View Details

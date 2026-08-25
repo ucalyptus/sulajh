@@ -3,6 +3,7 @@
 import * as React from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
 import * as stylex from "@stylexjs/stylex"
+import type { WithStyleX } from "@/components/ui/types"
 import { colors } from "@/styles/tokens.stylex"
 
 export const labelStyles = stylex.create({
@@ -16,9 +17,7 @@ export const labelStyles = stylex.create({
   },
 })
 
-export interface LabelProps extends React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> {
-  style?: stylex.StyleXStyles
-}
+export type LabelProps = WithStyleX<React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>>
 
 const Label = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,

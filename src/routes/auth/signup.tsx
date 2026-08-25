@@ -1,11 +1,27 @@
-import { createFileRoute, Link, redirect } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import { getSession } from '@/src/server/auth'
+import { useEffect, useState } from 'react'
 import { prisma } from '@/lib/prisma'
 import { Card } from '@/components/ui/card'
 import SignUpForm from '@/components/SignUpForm'
 import * as stylex from '@stylexjs/stylex'
 import { colors, spacing } from '@/styles/tokens.stylex'
+
+export interface InvitationData {
+  email: string
+  token: string
+}
+
+const getInvitationData = createServerFn({ method: 'GET' })
+  .validator((d: { invitation?: string }) => d)
+  .handler(async ({ data }): Promise<InvitationData | null> => {
+    if (!data.invitation) return null
+    const inv = await prisma.caseInvitation.findUnique({
+      where: { token: data.invitation },
+      select: { email: true },
+    })
+    return inv ? { email: inv.email, token: data.invitation } : null
+})
 
 const styles = stylex.create({
   wrapper: {
@@ -52,38 +68,20 @@ const styles = stylex.create({
   },
 })
 
-const getSignUpData = createServerFn({ method: 'GET' })
-  .validator((d: { invitation?: string }) => d)
-  .handler(async ({ data }) => {
-    const session = await getSession()
-    if (session) throw redirect({ to: '/dashboard' })
-
-    let invitationData = null
-    if (data.invitation) {
-      const invitation = await prisma.caseInvitation.findUnique({
-        where: { token: data.invitation },
-        select: { email: true },
-      })
-      if (invitation) {
-        invitationData = { email: invitation.email, token: data.invitation }
-      }
-    }
-
-    return { invitationData }
-  })
-
 export const Route = createFileRoute('/auth/signup')({
   validateSearch: (search: Record<string, unknown>) => ({
     invitation: (search.invitation as string) || undefined,
   }),
   component: SignUpPage,
-  loader: ({ search }) =>
-    getSignUpData({ data: { invitation: search?.invitation } }),
 })
 
 function SignUpPage() {
-  const { invitationData } = Route.useLoaderData()
+  const { invitation } = Route.useSearch()
+  const [invitationData, setInvitationData] = useState<InvitationData | null>(null)
 
+  useEffect(() => {
+    getInvitationData({ data: { invitation } }).then(setInvitationData)
+  }, [invitation])
   return (
     <div {...stylex.props(styles.wrapper)}>
       <Card style={styles.card}>

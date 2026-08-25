@@ -3,6 +3,7 @@
 import * as React from "react"
 import * as SwitchPrimitives from "@radix-ui/react-switch"
 import * as stylex from "@stylexjs/stylex"
+import type { WithStyleX } from "@/components/ui/types"
 import { colors, radii } from "@/styles/tokens.stylex"
 
 export const switchStyles = stylex.create({
@@ -43,9 +44,7 @@ export const switchStyles = stylex.create({
   },
 })
 
-export interface SwitchProps extends React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> {
-  style?: stylex.StyleXStyles
-}
+export type SwitchProps = WithStyleX<React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>>
 
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,

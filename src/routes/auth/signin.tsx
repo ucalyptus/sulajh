@@ -144,7 +144,7 @@ function SignInPage() {
         </form>
         <p {...stylex.props(styles.footerText)}>
           Don&apos;t have an account?{' '}
-          <Link to="/auth/signup" {...stylex.props(styles.link)}>
+          <Link to="/auth/signup" search={{ invitation: undefined }} {...stylex.props(styles.link)}>
             Sign up
           </Link>
         </p>

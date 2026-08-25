@@ -1,5 +1,6 @@
 import * as React from "react"
 import * as stylex from "@stylexjs/stylex"
+import type { WithStyleX } from "@/components/ui/types"
 import { colors, spacing, radii } from "@/styles/tokens.stylex"
 
 export const textareaStyles = stylex.create({
@@ -34,9 +35,7 @@ export const textareaStyles = stylex.create({
   },
 })
 
-export interface TextareaProps extends React.ComponentProps<"textarea"> {
-  style?: stylex.StyleXStyles
-}
+export type TextareaProps = WithStyleX<React.ComponentProps<"textarea">>
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ style, ...props }, ref) => {

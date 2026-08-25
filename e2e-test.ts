@@ -151,7 +151,7 @@ async function run() {
           await submitBtn.click({ timeout: 5000 })
         // Wait for either redirect or page content change
         try {
-          await page.waitForURL(url => !url.includes('/cases/new'), { timeout: 20000 })
+          await page.waitForURL((url) => !String(url).includes('/cases/new'), { timeout: 20000 })
           log('Case created', 'PASS', `Redirected to ${page.url()}`)
         } catch {
           // Case might have been created but redirect was slow

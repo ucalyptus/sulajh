@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { createAdminUser } from '@/src/server/admin'
-import { User, UserRole } from '@prisma/client'
+import { createAdminUser, getAdminUsers, type AdminUserRow } from '@/src/server/admin'
 import { Button } from '@/components/ui/button'
+import { UserRole } from '@prisma/client'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -72,7 +72,7 @@ const styles = stylex.create({
 })
 
 interface UserManagementProps {
-  users: User[]
+  users: AdminUserRow[]
 }
 
 export function UserManagement({ users: initialUsers }: UserManagementProps) {
@@ -87,7 +87,7 @@ export function UserManagement({ users: initialUsers }: UserManagementProps) {
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const createdUser = await createAdminUser({
+      await createAdminUser({
         data: {
           email: newUser.email,
           name: newUser.name,
@@ -95,7 +95,8 @@ export function UserManagement({ users: initialUsers }: UserManagementProps) {
         },
       })
 
-      setUsers([createdUser, ...users])
+      // Refetch the authoritative list instead of optimistically inserting.
+      setUsers(await getAdminUsers())
       setIsAddingUser(false)
       setNewUser({ email: '', name: '', role: 'CASE_MANAGER' })
 
@@ -143,7 +144,7 @@ export function UserManagement({ users: initialUsers }: UserManagementProps) {
               value={newUser.role}
               onValueChange={(val) => setNewUser({ ...newUser, role: val as UserRole })}
             >
-              <SelectTrigger style={{ width: '100%' }}>
+              <SelectTrigger>
                 <SelectValue placeholder="Select Role" />
               </SelectTrigger>
               <SelectContent>

@@ -1,5 +1,6 @@
 import * as React from "react"
 import * as stylex from "@stylexjs/stylex"
+import type { WithStyleX } from "@/components/ui/types"
 import { colors, spacing, radii } from "@/styles/tokens.stylex"
 
 export const badgeStyles = stylex.create({
@@ -41,9 +42,8 @@ export const badgeStyles = stylex.create({
   },
 })
 
-export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "secondary" | "destructive" | "outline"
-  style?: stylex.StyleXStyles
+export type BadgeProps = WithStyleX<React.HTMLAttributes<HTMLDivElement>> & {
+  variant?: "destructive" | "default" | "secondary" | "destructive" | "outline"
   children?: React.ReactNode
 }
 

@@ -1,5 +1,6 @@
 import * as React from "react"
 import * as stylex from "@stylexjs/stylex"
+import type { WithStyleX } from "@/components/ui/types"
 import { colors, spacing, radii } from "@/styles/tokens.stylex"
 
 export const inputStyles = stylex.create({
@@ -33,9 +34,7 @@ export const inputStyles = stylex.create({
   },
 })
 
-export interface InputProps extends React.ComponentProps<"input"> {
-  style?: stylex.StyleXStyles
-}
+export type InputProps = WithStyleX<React.ComponentProps<"input">>
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ type, style, ...props }, ref) => {

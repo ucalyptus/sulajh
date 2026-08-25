@@ -62,20 +62,18 @@ export default function SignUpForm({ invitationData }: SignUpFormProps) {
     setError('')
 
     try {
-      const result = await signUp({
-        name,
-        email,
-        password,
-        role: invitationData ? 'RESPONDENT' : role,
-        invitationToken: invitationData?.token,
+      await signUp({
+        data: {
+          name,
+          email,
+          password,
+          role: invitationData ? 'RESPONDENT' : role,
+          invitationToken: invitationData?.token,
+        },
       })
 
-      if (result.error) {
-        setError(result.error)
-      } else {
-        router.navigate({ to: '/dashboard' })
-        router.invalidate()
-      }
+      router.navigate({ to: '/dashboard' })
+      router.invalidate()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during sign up')
     } finally {
@@ -130,7 +128,7 @@ export default function SignUpForm({ invitationData }: SignUpFormProps) {
             value={role}
             onValueChange={(v) => setRole(v as 'CLAIMANT' | 'RESPONDENT' | 'NEUTRAL')}
           >
-            <SelectTrigger style={{ width: '100%' }}>
+            <SelectTrigger>
               <SelectValue placeholder="Select your role" />
             </SelectTrigger>
             <SelectContent>

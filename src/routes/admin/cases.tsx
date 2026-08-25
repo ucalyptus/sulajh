@@ -1,7 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
-import { prisma } from '@/lib/prisma'
-import { formatDate } from '@/lib/utils'
+import { getAdminCases as adminGetCases, type AdminCaseRow } from '@/src/server/admin'
 import {
   useReactTable,
   getCoreRowModel,
@@ -88,33 +86,10 @@ const styles = stylex.create({
   },
 })
 
-export interface CaseRow {
-  id: string
-  status: string
-  createdAt: string
-  claimant: { email: string }
-  respondent: { email: string } | null
-  caseManager: { name: string | null } | null
-}
+type CaseRow = AdminCaseRow
+// Authorized in src/server/admin.ts (REGISTRAR-only).
+const getAdminCases = adminGetCases
 
-const getAdminCases = createServerFn({ method: 'GET' }).handler(async (): Promise<CaseRow[]> => {
-  const cases = await prisma.case.findMany({
-    orderBy: { createdAt: 'desc' },
-    select: {
-      id: true,
-      status: true,
-      createdAt: true,
-      claimant: { select: { email: true } },
-      respondent: { select: { email: true } },
-      caseManager: { select: { name: true } },
-    },
-  })
-
-  return cases.map((case_) => ({
-    ...case_,
-    createdAt: formatDate(case_.createdAt),
-  }))
-})
 
 const columnHelper = createColumnHelper<CaseRow>()
 

@@ -90,7 +90,7 @@ export function CaseAssignment({ case_, caseManagers, neutrals, onAssign }: Case
               value={selectedCaseManager}
               onValueChange={setSelectedCaseManager}
             >
-              <SelectTrigger style={{ width: '100%' }}>
+              <SelectTrigger>
                 <SelectValue placeholder="Select Case Manager" />
               </SelectTrigger>
               <SelectContent>
@@ -109,7 +109,7 @@ export function CaseAssignment({ case_, caseManagers, neutrals, onAssign }: Case
               value={selectedNeutral}
               onValueChange={setSelectedNeutral}
             >
-              <SelectTrigger style={{ width: '100%' }}>
+              <SelectTrigger>
                 <SelectValue placeholder="Select Neutral" />
               </SelectTrigger>
               <SelectContent>

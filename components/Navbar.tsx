@@ -143,6 +143,7 @@ export default function Navbar() {
             </Link>
             <Link
               to="/auth/signup"
+              search={{ invitation: undefined }}
               {...stylex.props(styles.signUpLink)}
             >
               Sign Up

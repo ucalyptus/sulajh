@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import * as stylex from "@stylexjs/stylex"
+import type { WithStyleX } from "@/components/ui/types"
 import { colors, spacing, radii } from "@/styles/tokens.stylex"
 
 export const buttonStyles = stylex.create({
@@ -103,11 +104,10 @@ export const buttonStyles = stylex.create({
   },
 })
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export type ButtonProps = WithStyleX<React.ButtonHTMLAttributes<HTMLButtonElement>> & {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
   size?: "default" | "sm" | "lg" | "icon"
   asChild?: boolean
-  style?: stylex.StyleXStyles
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(

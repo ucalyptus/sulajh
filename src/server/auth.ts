@@ -24,12 +24,12 @@ export interface SessionUser {
 }
 
 function signToken(user: SessionUser): string {
-  return jwt.sign(user, JWT_SECRET, { expiresIn: '7d' })
+  return jwt.sign({ ...user }, JWT_SECRET as string, { expiresIn: '7d' })
 }
 
 function verifyToken(token: string): SessionUser | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as SessionUser
+    return jwt.verify(token, JWT_SECRET as string) as unknown as SessionUser
   } catch {
     return null
   }

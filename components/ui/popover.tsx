@@ -3,6 +3,7 @@
 import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 import * as stylex from "@stylexjs/stylex"
+import type { WithStyleX } from "@/components/ui/types"
 import { colors, spacing, radii } from "@/styles/tokens.stylex"
 
 export const popoverStyles = stylex.create({
@@ -25,10 +26,7 @@ export const popoverStyles = stylex.create({
 const Popover = PopoverPrimitive.Root
 const PopoverTrigger = PopoverPrimitive.Trigger
 
-export interface PopoverContentProps
-  extends React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content> {
-  style?: stylex.StyleXStyles
-}
+export type PopoverContentProps = WithStyleX<React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>>
 
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,

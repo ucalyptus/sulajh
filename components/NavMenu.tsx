@@ -70,6 +70,14 @@ const styles = stylex.create({
     backgroundColor: 'rgba(37, 99, 235, 0.1)',
     color: colors.primary,
   },
+  mobileEmail: {
+    fontSize: '0.75rem',
+    color: colors.mutedForeground,
+    paddingLeft: 12,
+    paddingTop: 4,
+    paddingBottom: 4,
+    margin: 0,
+  },
   actionsDesktop: {
     display: {
       default: 'none',
@@ -224,7 +232,7 @@ export default function NavMenu() {
               <Link to="/auth/signin">
                 <Button size="sm" variant="ghost">Sign In</Button>
               </Link>
-              <Link to="/auth/signup">
+              <Link to="/auth/signup" search={{ invitation: undefined }}>
                 <Button size="sm">Sign Up</Button>
               </Link>
             </>
@@ -264,7 +272,7 @@ export default function NavMenu() {
           <div {...stylex.props(styles.mobileDivider)}>
             {session ? (
               <>
-                <p {...stylex.props(styles.emailText, { paddingLeft: 12, paddingTop: 4, paddingBottom: 4 })}>{session.email}</p>
+                <p {...stylex.props(styles.mobileEmail)}>{session.email}</p>
                 <button
                   onClick={handleSignOut}
                   {...stylex.props(styles.mobileSignOut)}
@@ -277,7 +285,7 @@ export default function NavMenu() {
                 <Link to="/auth/signin" onClick={() => setMobileOpen(false)} {...stylex.props(styles.mobileLink)}>
                   Sign In
                 </Link>
-                <Link to="/auth/signup" onClick={() => setMobileOpen(false)} {...stylex.props(styles.mobileLink, styles.linkActive)}>
+                <Link to="/auth/signup" search={{ invitation: undefined }} onClick={() => setMobileOpen(false)} {...stylex.props(styles.mobileLink, styles.linkActive)}>
                   Sign Up
                 </Link>
               </>
