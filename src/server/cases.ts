@@ -51,8 +51,20 @@ export const getCase = createServerFn({ method: 'GET' })
     const session = await getSession()
     if (!session) throw new Error('Unauthorized')
 
-    return prisma.case.findUnique({
-      where: { id: data.id },
+    // IDOR guard: only case parties (or a Registrar) may read the full record.
+    const partyAccess = {
+      OR: [
+        { claimantId: session.id },
+        { respondentId: session.id },
+        { caseManagerId: session.id },
+        { neutralId: session.id },
+      ],
+    }
+
+    return prisma.case.findFirst({
+      where: session.role === 'REGISTRAR'
+        ? { id: data.id }
+        : { id: data.id, ...partyAccess },
       include: {
         claimant: { select: { id: true, name: true, email: true } },
         respondent: { select: { id: true, name: true, email: true } },
@@ -112,13 +124,35 @@ export const createCase = createServerFn({ method: 'POST' })
   })
 
 export const respondToCase = createServerFn({ method: 'POST' })
-  .validator((d: { caseId: string; response: string }) => d)
+  .validator((d: { caseId: string; response: string; token?: string }) => d)
   .handler(async ({ data }) => {
     const session = await getSession()
     if (!session) throw new Error('Unauthorized')
 
-    return prisma.case.update({
+    const case_ = await prisma.case.findUnique({
       where: { id: data.caseId },
+      select: { id: true, respondentId: true },
+    })
+    if (!case_) throw new Error('Case not found')
+
+    // Authorize: assigned respondent, or a valid pending invitation for this case
+    let authorized = case_.respondentId === session.id
+    if (!authorized && data.token) {
+      const invitation = await prisma.caseInvitation.findUnique({
+        where: { token: data.token },
+        select: { caseId: true, status: true, email: true, expiresAt: true },
+      })
+      authorized =
+        invitation !== null &&
+        invitation.caseId === case_.id &&
+        invitation.status === 'PENDING' &&
+        invitation.expiresAt > new Date() &&
+        invitation.email === session.email
+    }
+    if (!authorized) throw new Error('Forbidden')
+
+    return prisma.case.update({
+      where: { id: case_.id },
       data: {
         respondentResponse: data.response,
         status: 'RESPONSE_SUBMITTED',
@@ -155,10 +189,20 @@ export const issueJudgment = createServerFn({ method: 'POST' })
   .validator((d: { caseId: string; decision: string }) => d)
   .handler(async ({ data }) => {
     const session = await getSession()
-    if (!session || session.role !== 'NEUTRAL') throw new Error('Unauthorized')
+    if (!session || session.role !== 'NEUTRAL') throw new Error('Forbidden')
+
+    if (!data.decision.trim()) throw new Error('Decision text is required')
+    if (data.decision.length > 50_000) throw new Error('Decision is too long')
+
+    // Only the assigned neutral on this case may issue its decision.
+    const case_ = await prisma.case.findFirst({
+      where: { id: data.caseId, neutralId: session.id },
+      select: { id: true },
+    })
+    if (!case_) throw new Error('Forbidden')
 
     return prisma.case.update({
-      where: { id: data.caseId },
+      where: { id: case_.id },
       data: {
         finalDecision: data.decision,
         status: 'DECISION_ISSUED',

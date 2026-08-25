@@ -1,6 +1,7 @@
 'use client'
 
-import { useCompletion } from '@ai-sdk/react'
+import { aiRespondentAssist } from '@/src/server/ai'
+import { respondToCase } from '@/src/server/cases'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useRouter, useSearch } from '@tanstack/react-router'
@@ -34,6 +35,10 @@ const styles = stylex.create({
   textarea: {
     marginBottom: spacing[4],
   },
+  errorText: {
+    color: colors.red500,
+    fontSize: '0.875rem',
+  },
 })
 
 export function Respondent() {
@@ -41,19 +46,26 @@ export function Respondent() {
   const searchParams = useSearch({ strict: false }) as Record<string, string>
   const caseId = searchParams['caseId'] || null
   const [response, setResponse] = useState('')
-  const { complete } = useCompletion({ api: '/api/respondent' })
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmitResponse = async () => {
     if (!caseId || !response.trim()) return
-    
-    const aiResponse = await complete(JSON.stringify({
-      caseId,
-      responseText: response
-    }))
-    
-    console.log('Response submitted for case:', caseId, aiResponse)
-    router.navigate({ to: '/neutral', search: { caseId } })
-    localStorage.setItem(`case_${caseId}_response`, aiResponse ?? '')
+    setIsSubmitting(true)
+    setError('')
+
+    try {
+      // AI-assisted structuring of the respondent's position.
+      await aiRespondentAssist({ data: { caseId, responseText: response } })
+
+      await respondToCase({ data: { caseId, response } })
+      router.navigate({ to: '/cases/$id', params: { id: caseId } })
+    } catch (err) {
+      console.error('Error submitting response:', err)
+      setError(err instanceof Error ? err.message : 'Failed to submit response')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -74,11 +86,12 @@ export function Respondent() {
               rows={6}
             />
           </div>
+          {error && <p {...stylex.props(styles.errorText)}>{error}</p>}
           <Button 
             onClick={handleSubmitResponse}
-            disabled={!response.trim()}
+            disabled={!response.trim() || isSubmitting}
           >
-            Submit Response
+            {isSubmitting ? 'Submitting...' : 'Submit Response'}
           </Button>
         </>
       ) : (

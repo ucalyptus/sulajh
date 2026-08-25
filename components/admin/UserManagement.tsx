@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { createAdminUser } from '@/src/server/admin'
 import { User, UserRole } from '@prisma/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -86,27 +87,24 @@ export function UserManagement({ users: initialUsers }: UserManagementProps) {
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await fetch('/api/admin/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newUser)
+      const createdUser = await createAdminUser({
+        data: {
+          email: newUser.email,
+          name: newUser.name,
+          role: newUser.role as 'CASE_MANAGER' | 'NEUTRAL',
+        },
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to create user')
-      }
-
-      const createdUser = await response.json()
       setUsers([createdUser, ...users])
       setIsAddingUser(false)
       setNewUser({ email: '', name: '', role: 'CASE_MANAGER' })
-      
+
       toast.success('User created successfully', {
         description: 'An invitation email has been sent with login credentials.'
       })
     } catch (error) {
       console.error('Error creating user:', error)
-      toast.error('Failed to create user')
+      toast.error(error instanceof Error ? error.message : 'Failed to create user')
     }
   }
 

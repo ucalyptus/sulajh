@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { respondToCase } from '@/src/server/cases'
 import { useRouter } from '@tanstack/react-router'
+
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -47,19 +49,7 @@ export function RespondentResponseForm({ caseId, token }: RespondentResponseForm
     setIsSubmitting(true)
 
     try {
-      const res = await fetch(`/api/cases/${caseId}/respond`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          response,
-          token
-        })
-      })
-
-      if (!res.ok) {
-        throw new Error('Failed to submit response')
-      }
-
+      await respondToCase({ data: { caseId, response, token } })
       toast.success('Response submitted successfully')
       router.navigate({ to: '/cases/$id', params: { id: caseId } })
     } catch (error) {

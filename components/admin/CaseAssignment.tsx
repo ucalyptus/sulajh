@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { assignCase } from '@/src/server/cases'
 import { User, Case } from '@prisma/client'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -55,18 +56,13 @@ export function CaseAssignment({ case_, caseManagers, neutrals, onAssign }: Case
 
   const handleAssign = async () => {
     try {
-      const response = await fetch(`/api/cases/${case_.id}/assign`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          caseManagerId: selectedCaseManager,
-          neutralId: selectedNeutral
-        })
+      await assignCase({
+        data: {
+          caseId: case_.id,
+          caseManagerId: selectedCaseManager || undefined,
+          neutralId: selectedNeutral || undefined,
+        },
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to assign case')
-      }
 
       toast.success('Case assigned successfully')
       setIsAssigning(false)
