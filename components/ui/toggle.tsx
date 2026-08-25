@@ -2,44 +2,78 @@
 
 import * as React from "react"
 import * as TogglePrimitive from "@radix-ui/react-toggle"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as stylex from "@stylexjs/stylex"
+import { colors, spacing, radii } from "@/styles/tokens.stylex"
 
-import { cn } from "@/lib/utils"
+export const toggleStyles = stylex.create({
+  base: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: radii.md,
+    fontSize: "0.875rem",
+    fontWeight: 500,
+    outline: "none",
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    color: colors.foreground,
+    cursor: "pointer",
+    transitionProperty: "background-color, color",
+    transitionDuration: "0.2s",
+    boxSizing: "border-box",
+  },
+  default: {
+    backgroundColor: "transparent",
+  },
+  outline: {
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.input,
+    backgroundColor: "transparent",
+  },
+  sizeDefault: {
+    height: "2.5rem",
+    paddingLeft: spacing[3],
+    paddingRight: spacing[3],
+    minWidth: "2.5rem",
+  },
+  sm: {
+    height: "2.25rem",
+    paddingLeft: spacing[2.5],
+    paddingRight: spacing[2.5],
+    minWidth: "2.25rem",
+  },
+  lg: {
+    height: "2.75rem",
+    paddingLeft: spacing[5],
+    paddingRight: spacing[5],
+    minWidth: "2.75rem",
+  },
+})
 
-const toggleVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 gap-2",
-  {
-    variants: {
-      variant: {
-        default: "bg-transparent",
-        outline:
-          "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
-      },
-      size: {
-        default: "h-10 px-3 min-w-10",
-        sm: "h-9 px-2.5 min-w-9",
-        lg: "h-11 px-5 min-w-11",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-)
+export interface ToggleProps
+  extends React.ComponentPropsWithoutRef<typeof TogglePrimitive.Root> {
+  variant?: "default" | "outline"
+  size?: "default" | "sm" | "lg"
+  style?: stylex.StyleXStyles
+}
 
 const Toggle = React.forwardRef<
   React.ElementRef<typeof TogglePrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof TogglePrimitive.Root> &
-    VariantProps<typeof toggleVariants>
->(({ className, variant, size, ...props }, ref) => (
-  <TogglePrimitive.Root
-    ref={ref}
-    className={cn(toggleVariants({ variant, size, className }))}
-    {...props}
-  />
-))
+  ToggleProps
+>(({ style, variant = "default", size = "default", ...props }, ref) => {
+  const variantStyle = toggleStyles[variant] || toggleStyles.default
+  const sizeStyle = size === "default" ? toggleStyles.sizeDefault : toggleStyles[size] || toggleStyles.sizeDefault
+
+  return (
+    <TogglePrimitive.Root
+      ref={ref}
+      {...stylex.props(toggleStyles.base, variantStyle, sizeStyle, style)}
+      {...props}
+    />
+  )
+})
 
 Toggle.displayName = TogglePrimitive.Root.displayName
 
-export { Toggle, toggleVariants }
+export { Toggle }

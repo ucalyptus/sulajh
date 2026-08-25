@@ -6,6 +6,19 @@ import { Textarea } from '@/components/ui/textarea'
 import { useState } from 'react'
 import { CaseState } from '@/src/types'
 import { useRouter } from '@tanstack/react-router'
+import * as stylex from '@stylexjs/stylex'
+import { spacing } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  wrapper: {
+    maxWidth: '42rem',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  textarea: {
+    marginBottom: spacing[4],
+  },
+})
 
 export function Claimant() {
   const router = useRouter()
@@ -20,23 +33,21 @@ export function Claimant() {
       status: 'claimant_submitted',
       claimantRequest: response ?? undefined
     }
-    // Here you would typically save the case to a database
     console.log('New case created:', newCase)
     localStorage.setItem(`case_${caseId}_claim`, response ?? '')
     router.navigate({ to: '/platform', search: { caseId } })
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div {...stylex.props(styles.wrapper)}>
       <Textarea
         value={request}
         onChange={(e) => setRequest(e.target.value)}
         placeholder="Describe your dispute..."
-        className="mb-4"
+        style={styles.textarea}
         rows={6}
       />
       <Button onClick={handleSubmit}>Submit Request</Button>
     </div>
   )
 }
-

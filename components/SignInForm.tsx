@@ -4,6 +4,31 @@ import { useState } from 'react'
 import { signIn } from '@/src/server/auth'
 import { useRouter } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[4],
+  },
+  fieldGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[2],
+  },
+  errorText: {
+    color: colors.red500,
+    fontSize: '0.875rem',
+    margin: 0,
+  },
+  submitButton: {
+    width: '100%',
+  },
+})
 
 export default function SignInForm() {
   const router = useRouter()
@@ -18,8 +43,6 @@ export default function SignInForm() {
     setError('')
 
     try {
-      console.log('Attempting to sign in with email:', email)
-      
       const result = await signIn('credentials', {
         email,
         password,
@@ -27,15 +50,12 @@ export default function SignInForm() {
       })
 
       if (result?.error) {
-        console.error('Sign in error:', result.error)
         setError(result.error)
       } else {
-        console.log('Sign in successful')
         router.navigate({ to: '/dashboard' })
         router.invalidate()
       }
-    } catch (error) {
-      console.error('Sign in error:', error)
+    } catch (err: any) {
       setError('An error occurred during sign in')
     } finally {
       setIsLoading(false)
@@ -43,37 +63,37 @@ export default function SignInForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-2">Email</label>
-        <input
+    <form onSubmit={handleSubmit} {...stylex.props(styles.form)}>
+      <div {...stylex.props(styles.fieldGroup)}>
+        <Label htmlFor="signin-email">Email</Label>
+        <Input
+          id="signin-email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 border rounded"
           required
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium mb-2">Password</label>
-        <input
+      <div {...stylex.props(styles.fieldGroup)}>
+        <Label htmlFor="signin-password">Password</Label>
+        <Input
+          id="signin-password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 border rounded"
           required
         />
       </div>
       {error && (
-        <p className="text-red-500 text-sm">{error}</p>
+        <p {...stylex.props(styles.errorText)}>{error}</p>
       )}
       <Button
         type="submit"
-        className="w-full"
+        style={styles.submitButton}
         disabled={isLoading}
       >
         {isLoading ? 'Signing in...' : 'Sign In'}
       </Button>
     </form>
   )
-} 
+}

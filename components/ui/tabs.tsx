@@ -2,21 +2,59 @@
 
 import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
+import * as stylex from "@stylexjs/stylex"
+import { colors, spacing, radii } from "@/styles/tokens.stylex"
 
-import { cn } from "@/lib/utils"
+export const tabsStyles = stylex.create({
+  list: {
+    display: "inline-flex",
+    height: "2.5rem",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: radii.md,
+    backgroundColor: colors.muted,
+    padding: spacing[1],
+    color: colors.mutedForeground,
+  },
+  trigger: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    whiteSpace: "nowrap",
+    borderRadius: radii.sm,
+    paddingLeft: spacing[3],
+    paddingRight: spacing[3],
+    paddingTop: spacing[1.5],
+    paddingBottom: spacing[1.5],
+    fontSize: "0.875rem",
+    fontWeight: 500,
+    outline: "none",
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    color: colors.mutedForeground,
+    cursor: "pointer",
+    transitionProperty: "all",
+    transitionDuration: "0.2s",
+  },
+  content: {
+    marginTop: spacing[2],
+    outline: "none",
+  },
+})
 
 const Tabs = TabsPrimitive.Root
 
+export interface TabsComponentProps {
+  style?: stylex.StyleXStyles
+}
+
 const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List> & TabsComponentProps
+>(({ style, ...props }, ref) => (
   <TabsPrimitive.List
     ref={ref}
-    className={cn(
-      "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
-      className
-    )}
+    {...stylex.props(tabsStyles.list, style)}
     {...props}
   />
 ))
@@ -24,14 +62,11 @@ TabsList.displayName = TabsPrimitive.List.displayName
 
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> & TabsComponentProps
+>(({ style, ...props }, ref) => (
   <TabsPrimitive.Trigger
     ref={ref}
-    className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
-      className
-    )}
+    {...stylex.props(tabsStyles.trigger, style)}
     {...props}
   />
 ))
@@ -39,14 +74,11 @@ TabsTrigger.displayName = TabsPrimitive.Trigger.displayName
 
 const TabsContent = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content> & TabsComponentProps
+>(({ style, ...props }, ref) => (
   <TabsPrimitive.Content
     ref={ref}
-    className={cn(
-      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-      className
-    )}
+    {...stylex.props(tabsStyles.content, style)}
     {...props}
   />
 ))

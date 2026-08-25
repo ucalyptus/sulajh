@@ -3,7 +3,34 @@
 import { useState } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[6],
+  },
+  fieldGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[2],
+  },
+  footer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  helperText: {
+    fontSize: '0.875rem',
+    color: colors.gray500,
+    margin: 0,
+  },
+})
 
 interface RespondentResponseFormProps {
   caseId: string
@@ -44,23 +71,21 @@ export function RespondentResponseForm({ caseId, token }: RespondentResponseForm
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium mb-2">
-          Your Response
-        </label>
-        <textarea
+    <form onSubmit={handleSubmit} {...stylex.props(styles.form)}>
+      <div {...stylex.props(styles.fieldGroup)}>
+        <Label htmlFor="response">Your Response</Label>
+        <Textarea
+          id="response"
           value={response}
           onChange={(e) => setResponse(e.target.value)}
           rows={6}
-          className="w-full p-2 border rounded"
           placeholder="Provide your response to the claim..."
           required
         />
       </div>
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-500">
+      <div {...stylex.props(styles.footer)}>
+        <p {...stylex.props(styles.helperText)}>
           Your response will be shared with all parties involved in the case.
         </p>
         <Button type="submit" disabled={isSubmitting}>
@@ -69,4 +94,4 @@ export function RespondentResponseForm({ caseId, token }: RespondentResponseForm
       </div>
     </form>
   )
-} 
+}

@@ -1,9 +1,7 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
 import { logger } from './logger'
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+export function cn(...inputs: (string | boolean | null | undefined)[]) {
+  return inputs.filter(Boolean).join(" ")
 }
 
 export function generatePassword(length = 12): string {
@@ -21,12 +19,10 @@ export function formatDate(date: string | Date | null | undefined): string {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date
 
-    // Check if date is valid
     if (isNaN(dateObj.getTime())) {
       return 'Invalid date'
     }
 
-    // Ensure consistent date format between server and client
     return dateObj.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -51,7 +47,6 @@ export function formatRelativeDate(date: string | Date | null | undefined): stri
     const now = new Date()
     const diffInMs = now.getTime() - dateObj.getTime()
 
-    // Handle future dates
     if (diffInMs < 0) {
       return formatDate(date)
     }
@@ -71,11 +66,11 @@ export function formatRelativeDate(date: string | Date | null | undefined): stri
     }
 
     if (diffInDays < 365) {
-      const months = Math.floor(diffInDays / 30.44) // Average days per month
+      const months = Math.floor(diffInDays / 30.44)
       return `${months} ${months === 1 ? 'month' : 'months'} ago`
     }
 
-    const years = Math.floor(diffInDays / 365.25) // Account for leap years
+    const years = Math.floor(diffInDays / 365.25)
     return `${years} ${years === 1 ? 'year' : 'years'} ago`
   } catch (error) {
     logger.error('Error formatting relative date', error)
@@ -85,7 +80,6 @@ export function formatRelativeDate(date: string | Date | null | undefined): stri
 
 export function getNameFromEmail(email: string): string {
   const localPart = email.split('@')[0];
-  // Convert something like "john.doe" or "johndoe" to "John Doe"
   return localPart
     .split(/[._-]/)
     .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())

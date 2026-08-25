@@ -1,44 +1,58 @@
 import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as stylex from "@stylexjs/stylex"
+import { colors, spacing, radii } from "@/styles/tokens.stylex"
 
-import { cn } from "@/lib/utils"
+export const badgeStyles = stylex.create({
+  base: {
+    display: "inline-flex",
+    alignItems: "center",
+    borderRadius: radii.full,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    paddingLeft: spacing[2.5],
+    paddingRight: spacing[2.5],
+    paddingTop: spacing[0.5],
+    paddingBottom: spacing[0.5],
+    fontSize: "0.75rem",
+    fontWeight: 600,
+    transitionProperty: "background-color, color, border-color",
+    transitionDuration: "0.2s",
+    boxSizing: "border-box",
+  },
+  default: {
+    borderColor: "transparent",
+    backgroundColor: colors.primary,
+    color: colors.primaryForeground,
+  },
+  secondary: {
+    borderColor: "transparent",
+    backgroundColor: colors.secondary,
+    color: colors.secondaryForeground,
+  },
+  destructive: {
+    borderColor: "transparent",
+    backgroundColor: colors.destructive,
+    color: colors.destructiveForeground,
+  },
+  outline: {
+    borderColor: colors.border,
+    backgroundColor: "transparent",
+    color: colors.foreground,
+  },
+})
 
-const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-  {
-    variants: {
-      variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
-
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {
-  children: React.ReactNode
+export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: "default" | "secondary" | "destructive" | "outline"
+  style?: stylex.StyleXStyles
+  children?: React.ReactNode
 }
 
-export function Badge({ className, variant, ...props }: BadgeProps) {
+export function Badge({ variant = "default", style, ...props }: BadgeProps) {
+  const variantStyle = badgeStyles[variant] || badgeStyles.default
   return (
     <div
-      className={cn(
-        badgeVariants({ variant }),
-        className
-      )}
+      {...stylex.props(badgeStyles.base, variantStyle, style)}
       {...props}
     />
   )
 }
-
-export { badgeVariants }

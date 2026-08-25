@@ -5,6 +5,58 @@ import { Button } from '@/components/ui/button'
 import { useRouter, useSearch } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { CaseState } from '@/src/types'
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing, radii } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  wrapper: {
+    maxWidth: '42rem',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  headerBox: {
+    marginBottom: spacing[6],
+  },
+  heading: {
+    fontSize: '1.125rem',
+    fontWeight: 600,
+    margin: 0,
+  },
+  caseIdText: {
+    marginBottom: spacing[2],
+  },
+  card: {
+    marginBottom: spacing[4],
+    padding: spacing[4],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    backgroundColor: colors.gray50,
+  },
+  cardTitle: {
+    fontWeight: 500,
+    marginBottom: spacing[2],
+    margin: 0,
+  },
+  actionsGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[4],
+  },
+  decisionBox: {
+    marginTop: spacing[6],
+    padding: spacing[4],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colors.border,
+    borderRadius: radii.lg,
+    backgroundColor: colors.gray50,
+  },
+  preWrap: {
+    whiteSpace: 'pre-wrap',
+  },
+})
 
 export function Neutral() {
   const router = useRouter()
@@ -20,11 +72,8 @@ export function Neutral() {
     },
   })
 
-  // In a real app, this would fetch from your database
   useEffect(() => {
     if (caseId) {
-      // Simulating case data retrieval
-      // In a real app, this would be a fetch call to your API
       const mockCaseData: CaseState = {
         id: caseId,
         status: 'respondent_submitted',
@@ -40,30 +89,29 @@ export function Neutral() {
     if (!caseId || !caseData) return
     
     await complete(JSON.stringify(caseData))
-    // Here you would typically update the case in a database
     console.log('Proceedings completed for case:', caseId)
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div {...stylex.props(styles.wrapper)}>
       {caseId && caseData ? (
         <>
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold">Case Proceedings</h2>
-            <p className="mb-2">Case ID: {caseId}</p>
+          <div {...stylex.props(styles.headerBox)}>
+            <h2 {...stylex.props(styles.heading)}>Case Proceedings</h2>
+            <p {...stylex.props(styles.caseIdText)}>Case ID: {caseId}</p>
             
-            <div className="mb-4 p-4 border rounded bg-gray-50">
-              <h3 className="font-medium mb-2">Claim:</h3>
+            <div {...stylex.props(styles.card)}>
+              <h3 {...stylex.props(styles.cardTitle)}>Claim:</h3>
               <p>{caseData.claimantRequest}</p>
             </div>
             
-            <div className="mb-4 p-4 border rounded bg-gray-50">
-              <h3 className="font-medium mb-2">Response:</h3>
+            <div {...stylex.props(styles.card)}>
+              <h3 {...stylex.props(styles.cardTitle)}>Response:</h3>
               <p>{caseData.respondentResponse}</p>
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div {...stylex.props(styles.actionsGroup)}>
             <Button 
               onClick={handleConductProceedings}
               disabled={!!completion}
@@ -72,9 +120,9 @@ export function Neutral() {
             </Button>
 
             {completion && (
-              <div className="mt-6 p-4 border rounded-lg bg-gray-50">
-                <h3 className="font-medium mb-2">Decision:</h3>
-                <div className="whitespace-pre-wrap">{completion}</div>
+              <div {...stylex.props(styles.decisionBox)}>
+                <h3 {...stylex.props(styles.cardTitle)}>Decision:</h3>
+                <div {...stylex.props(styles.preWrap)}>{completion}</div>
               </div>
             )}
           </div>
@@ -85,4 +133,3 @@ export function Neutral() {
     </div>
   )
 }
-

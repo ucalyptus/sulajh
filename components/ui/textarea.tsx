@@ -1,22 +1,54 @@
 import * as React from "react"
+import * as stylex from "@stylexjs/stylex"
+import { colors, spacing, radii } from "@/styles/tokens.stylex"
 
-import { cn } from "@/lib/utils"
-
-const Textarea = React.forwardRef<
-  HTMLTextAreaElement,
-  React.ComponentProps<"textarea">
->(({ className, ...props }, ref) => {
-  return (
-    <textarea
-      className={cn(
-        "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        className
-      )}
-      ref={ref}
-      {...props}
-    />
-  )
+export const textareaStyles = stylex.create({
+  textarea: {
+    display: "flex",
+    minHeight: "80px",
+    width: "100%",
+    borderRadius: radii.md,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.input,
+    backgroundColor: colors.background,
+    paddingLeft: spacing[3],
+    paddingRight: spacing[3],
+    paddingTop: spacing[2],
+    paddingBottom: spacing[2],
+    fontSize: "0.875rem",
+    color: colors.foreground,
+    boxSizing: "border-box",
+    outline: "none",
+    transitionProperty: "border-color, box-shadow",
+    transitionDuration: "0.2s",
+    resize: "vertical",
+    ":focus": {
+      borderColor: colors.ring,
+      boxShadow: "0 0 0 2px rgba(37, 99, 235, 0.2)",
+    },
+    ":disabled": {
+      cursor: "not-allowed",
+      opacity: 0.5,
+    },
+  },
 })
+
+export interface TextareaProps extends React.ComponentProps<"textarea"> {
+  style?: stylex.StyleXStyles
+}
+
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ style, ...props }, ref) => {
+    return (
+      <textarea
+        ref={ref}
+        {...stylex.props(textareaStyles.textarea, style)}
+        {...props}
+      />
+    )
+  }
+)
 Textarea.displayName = "Textarea"
 
 export { Textarea }

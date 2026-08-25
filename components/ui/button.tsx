@@ -1,51 +1,125 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as stylex from "@stylexjs/stylex"
+import { colors, spacing, radii } from "@/styles/tokens.stylex"
 
-import { cn } from "@/lib/utils"
-
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-      },
-      size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
-      },
+export const buttonStyles = stylex.create({
+  base: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing[2],
+    whiteSpace: "nowrap",
+    borderRadius: radii.md,
+    fontSize: "0.875rem",
+    fontWeight: 500,
+    outline: "none",
+    transitionProperty: "background-color, color, border-color, box-shadow",
+    transitionDuration: "0.2s",
+    cursor: "pointer",
+    textDecoration: "none",
+    borderWidth: 0,
+    borderStyle: "solid",
+    boxSizing: "border-box",
+    opacity: {
+      default: 1,
+      ":disabled": 0.5,
     },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
+    pointerEvents: {
+      default: "auto",
+      ":disabled": "none",
     },
-  }
-)
+  },
+  default: {
+    backgroundColor: colors.primary,
+    color: colors.primaryForeground,
+    ":hover": {
+      backgroundColor: "hsl(221 83% 45%)",
+    },
+  },
+  destructive: {
+    backgroundColor: colors.destructive,
+    color: colors.destructiveForeground,
+    ":hover": {
+      backgroundColor: "hsl(0 84% 50%)",
+    },
+  },
+  outline: {
+    borderWidth: "1px",
+    borderColor: colors.input,
+    backgroundColor: colors.background,
+    color: colors.foreground,
+    ":hover": {
+      backgroundColor: colors.accent,
+      color: colors.accentForeground,
+    },
+  },
+  secondary: {
+    backgroundColor: colors.secondary,
+    color: colors.secondaryForeground,
+    ":hover": {
+      backgroundColor: "hsl(210 40% 90%)",
+    },
+  },
+  ghost: {
+    backgroundColor: "transparent",
+    color: colors.foreground,
+    ":hover": {
+      backgroundColor: colors.accent,
+      color: colors.accentForeground,
+    },
+  },
+  link: {
+    backgroundColor: "transparent",
+    color: colors.primary,
+    textDecoration: {
+      default: "none",
+      ":hover": "underline",
+    },
+  },
+  sizeDefault: {
+    height: "2.5rem",
+    paddingLeft: spacing[4],
+    paddingRight: spacing[4],
+    paddingTop: spacing[2],
+    paddingBottom: spacing[2],
+  },
+  sm: {
+    height: "2.25rem",
+    borderRadius: radii.md,
+    paddingLeft: spacing[3],
+    paddingRight: spacing[3],
+  },
+  lg: {
+    height: "2.75rem",
+    borderRadius: radii.md,
+    paddingLeft: spacing[8],
+    paddingRight: spacing[8],
+  },
+  icon: {
+    height: "2.5rem",
+    width: "2.5rem",
+    padding: 0,
+  },
+})
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
+  size?: "default" | "sm" | "lg" | "icon"
   asChild?: boolean
+  style?: stylex.StyleXStyles
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant = "default", size = "default", asChild = false, style, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
+    const variantStyle = buttonStyles[variant] || buttonStyles.default
+    const sizeStyle = size === "default" ? buttonStyles.sizeDefault : buttonStyles[size] || buttonStyles.sizeDefault
+
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        {...stylex.props(buttonStyles.base, variantStyle, sizeStyle, style)}
         {...props}
       />
     )
@@ -53,4 +127,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 )
 Button.displayName = "Button"
 
-export { Button, buttonVariants }
+export { Button }

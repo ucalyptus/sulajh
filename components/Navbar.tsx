@@ -1,109 +1,155 @@
 'use client'
 
-import { Link } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing, radii } from '@/styles/tokens.stylex'
 
-import { useLocation } from '@tanstack/react-router'
-import { authOptions } from '@/lib/auth'
+const styles = stylex.create({
+  nav: {
+    backgroundColor: colors.white,
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  },
+  container: {
+    maxWidth: '1280px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    paddingLeft: spacing[4],
+    paddingRight: spacing[4],
+  },
+  row: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    height: '4rem',
+  },
+  section: {
+    display: 'flex',
+  },
+  brandWrapper: {
+    flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
+  },
+  brandLink: {
+    fontSize: '1.25rem',
+    fontWeight: 700,
+    textDecoration: 'none',
+    color: colors.foreground,
+  },
+  links: {
+    display: {
+      default: 'none',
+      '@media (min-width: 640px)': 'flex',
+    },
+    marginLeft: spacing[6],
+    gap: spacing[8],
+  },
+  link: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    paddingLeft: spacing[1],
+    paddingRight: spacing[1],
+    paddingTop: spacing[1],
+    borderBottomWidth: '2px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'transparent',
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: colors.gray500,
+    textDecoration: 'none',
+    ':hover': {
+      color: colors.gray700,
+    },
+  },
+  linkActive: {
+    borderBottomColor: colors.indigo500,
+    color: colors.gray900,
+  },
+  actions: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  signInLink: {
+    color: colors.gray500,
+    paddingLeft: spacing[3],
+    paddingRight: spacing[3],
+    paddingTop: spacing[2],
+    paddingBottom: spacing[2],
+    borderRadius: radii.md,
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    textDecoration: 'none',
+    ':hover': {
+      color: colors.gray700,
+    },
+  },
+  signUpLink: {
+    backgroundColor: colors.indigo600,
+    color: colors.white,
+    paddingLeft: spacing[4],
+    paddingRight: spacing[4],
+    paddingTop: spacing[2],
+    paddingBottom: spacing[2],
+    borderRadius: radii.md,
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    textDecoration: 'none',
+    ':hover': {
+      backgroundColor: colors.indigo700,
+    },
+  },
+  userEmail: {
+    color: colors.gray500,
+    fontSize: '0.875rem',
+  },
+})
 
 export default function Navbar() {
-  const { data: session, status } = useSession()
-  const pathname = usePathname()
+  const location = useLocation()
+  const pathname = location.pathname
 
   const isActive = (path: string) => pathname === path
 
-  const getCasesLink = () => {
-    if (session?.user.role === 'REGISTRAR') {
-      return '/admin/cases'
-    }
-    return '/cases'
-  }
-
   return (
-    <nav className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="text-xl font-bold">
+    <nav {...stylex.props(styles.nav)}>
+      <div {...stylex.props(styles.container)}>
+        <div {...stylex.props(styles.row)}>
+          <div {...stylex.props(styles.section)}>
+            <div {...stylex.props(styles.brandWrapper)}>
+              <Link to="/" {...stylex.props(styles.brandLink)}>
                 Platform
               </Link>
             </div>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              {session && (
-                <>
-                  <Link 
-                    href="/dashboard"
-                    className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                      isActive('/dashboard')
-                        ? 'border-indigo-500 text-gray-900'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    Dashboard
-                  </Link>
-                  <Link 
-                    href={getCasesLink()}
-                    className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                      isActive(getCasesLink())
-                        ? 'border-indigo-500 text-gray-900'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    Cases
-                  </Link>
-                  {session.user.role === 'REGISTRAR' && (
-                    <>
-                      <Link 
-                        href="/admin/users"
-                        className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                          isActive('/admin/users')
-                            ? 'border-indigo-500 text-gray-900'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                        }`}
-                      >
-                        Users
-                      </Link>
-                      <Link 
-                        href="/admin/cases"
-                        className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                          isActive('/admin/cases')
-                            ? 'border-indigo-500 text-gray-900'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                        }`}
-                      >
-                        Manage Cases
-                      </Link>
-                    </>
-                  )}
-                </>
-              )}
+            <div {...stylex.props(styles.links)}>
+              <Link
+                to="/dashboard"
+                {...stylex.props(styles.link, isActive('/dashboard') && styles.linkActive)}
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/cases"
+                {...stylex.props(styles.link, isActive('/cases') && styles.linkActive)}
+              >
+                Cases
+              </Link>
             </div>
           </div>
-          <div className="flex items-center">
-            {!session && (
-              <>
-                <Link 
-                  href="/auth/signin"
-                  className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Sign In
-                </Link>
-                <Link 
-                  href="/auth/signup"
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
-                >
-                  Sign Up
-                </Link>
-              </>
-            )}
-            {session && (
-              <div className="text-gray-500">
-                {session.user.email}
-              </div>
-            )}
+          <div {...stylex.props(styles.actions)}>
+            <Link
+              to="/auth/signin"
+              {...stylex.props(styles.signInLink)}
+            >
+              Sign In
+            </Link>
+            <Link
+              to="/auth/signup"
+              {...stylex.props(styles.signUpLink)}
+            >
+              Sign Up
+            </Link>
           </div>
         </div>
       </div>
     </nav>
   )
-} 
+}

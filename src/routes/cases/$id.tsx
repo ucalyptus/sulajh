@@ -3,7 +3,94 @@ import { createServerFn } from '@tanstack/react-start'
 import { getSession } from '@/src/server/auth'
 import { prisma } from '@/lib/prisma'
 import { CaseJudgment } from '@/components/case-judgment'
-import { formatDate } from '@/lib/utils'
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing, radii } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  container: {
+    maxWidth: '1280px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    padding: spacing[8],
+  },
+  wrapper: {
+    maxWidth: '48rem',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  card: {
+    backgroundColor: colors.white,
+    borderRadius: radii.lg,
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+    padding: spacing[6],
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: spacing[6],
+  },
+  title: {
+    fontSize: '1.5rem',
+    fontWeight: 700,
+    margin: 0,
+  },
+  statusBadge: {
+    display: 'inline-block',
+    paddingLeft: spacing[3],
+    paddingRight: spacing[3],
+    paddingTop: spacing[1],
+    paddingBottom: spacing[1],
+    fontSize: '0.875rem',
+    borderRadius: radii.full,
+    backgroundColor: colors.blue100,
+    color: colors.blue700,
+    fontWeight: 500,
+  },
+  content: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[6],
+  },
+  sectionTitle: {
+    fontSize: '1.125rem',
+    fontWeight: 600,
+    marginBottom: spacing[2],
+    margin: 0,
+  },
+  subTitle: {
+    fontWeight: 600,
+    marginBottom: spacing[2],
+    margin: 0,
+  },
+  preText: {
+    whiteSpace: 'pre-wrap',
+    color: colors.gray700,
+    margin: 0,
+  },
+  dl: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[2],
+    fontSize: '0.875rem',
+    margin: 0,
+  },
+  dt: {
+    color: colors.gray500,
+  },
+  dd: {
+    margin: 0,
+    fontWeight: 500,
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: {
+      default: '1fr',
+      '@media (min-width: 768px)': 'repeat(2, 1fr)',
+    },
+    gap: spacing[6],
+  },
+})
 
 const getCaseData = createServerFn({ method: 'GET' })
   .validator((d: { id: string }) => d)
@@ -14,11 +101,11 @@ const getCaseData = createServerFn({ method: 'GET' })
     const case_ = await prisma.case.findUnique({
       where: { id: data.id },
       include: {
-        claimant: { select: { id: true, name: true, email: true, role: true } },
-        respondent: { select: { id: true, name: true, email: true, role: true } },
-        caseManager: { select: { id: true, name: true, email: true, role: true } },
-        neutral: { select: { id: true, name: true, email: true, role: true } },
-        invitations: { where: { status: 'PENDING' }, select: { email: true }, take: 1 },
+        claimant: true,
+        respondent: true,
+        caseManager: true,
+        neutral: true,
+        invitations: true,
       },
     })
 
@@ -53,31 +140,31 @@ export const Route = createFileRoute('/cases/$id')({
 })
 
 function CasePage() {
-  const { case_, session, caseManagers, neutrals } = Route.useLoaderData()
+  const { case_ } = Route.useLoaderData()
 
   return (
-    <div className="container mx-auto p-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex justify-between items-start mb-6">
-            <h1 className="text-2xl font-bold">Case #{case_.id}</h1>
-            <span className="inline-block px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
+    <div {...stylex.props(styles.container)}>
+      <div {...stylex.props(styles.wrapper)}>
+        <div {...stylex.props(styles.card)}>
+          <div {...stylex.props(styles.header)}>
+            <h1 {...stylex.props(styles.title)}>Case #{case_.id}</h1>
+            <span {...stylex.props(styles.statusBadge)}>
               {case_.status}
             </span>
           </div>
 
-          <div className="space-y-6">
+          <div {...stylex.props(styles.content)}>
             <div>
-              <h2 className="text-lg font-semibold mb-2">Claim Details</h2>
-              <p className="whitespace-pre-wrap text-gray-700">
+              <h2 {...stylex.props(styles.sectionTitle)}>Claim Details</h2>
+              <p {...stylex.props(styles.preText)}>
                 {case_.claimantRequest || 'No details provided'}
               </p>
             </div>
 
             {case_.respondentResponse && (
               <div>
-                <h2 className="text-lg font-semibold mb-2">Response</h2>
-                <p className="whitespace-pre-wrap text-gray-700">
+                <h2 {...stylex.props(styles.sectionTitle)}>Response</h2>
+                <p {...stylex.props(styles.preText)}>
                   {case_.respondentResponse}
                 </p>
               </div>
@@ -88,15 +175,15 @@ function CasePage() {
             )}
 
             <div>
-              <h3 className="font-semibold mb-2">Case Information</h3>
-              <dl className="space-y-2 text-sm">
+              <h3 {...stylex.props(styles.subTitle)}>Case Information</h3>
+              <dl {...stylex.props(styles.dl)}>
                 <div>
-                  <dt className="text-gray-500">Claimant</dt>
-                  <dd>{case_.claimant.email}</dd>
+                  <dt {...stylex.props(styles.dt)}>Claimant</dt>
+                  <dd {...stylex.props(styles.dd)}>{case_.claimant.email}</dd>
                 </div>
                 <div>
-                  <dt className="text-gray-500">Respondent</dt>
-                  <dd>
+                  <dt {...stylex.props(styles.dt)}>Respondent</dt>
+                  <dd {...stylex.props(styles.dd)}>
                     {case_.respondent?.email ||
                       case_.invitations[0]?.email ||
                       'Not assigned'}
@@ -105,17 +192,17 @@ function CasePage() {
               </dl>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div {...stylex.props(styles.grid)}>
               <div>
-                <h3 className="font-semibold mb-2">Case Officials</h3>
-                <dl className="space-y-2 text-sm">
+                <h3 {...stylex.props(styles.subTitle)}>Case Officials</h3>
+                <dl {...stylex.props(styles.dl)}>
                   <div>
-                    <dt className="text-gray-500">Case Manager</dt>
-                    <dd>{case_.caseManager?.name || 'Not assigned'}</dd>
+                    <dt {...stylex.props(styles.dt)}>Case Manager</dt>
+                    <dd {...stylex.props(styles.dd)}>{case_.caseManager?.name || 'Not assigned'}</dd>
                   </div>
                   <div>
-                    <dt className="text-gray-500">Neutral</dt>
-                    <dd>{case_.neutral?.name || 'Not assigned'}</dd>
+                    <dt {...stylex.props(styles.dt)}>Neutral</dt>
+                    <dd {...stylex.props(styles.dd)}>{case_.neutral?.name || 'Not assigned'}</dd>
                   </div>
                 </dl>
               </div>

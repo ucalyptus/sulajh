@@ -3,7 +3,72 @@
 import { useState } from 'react'
 import { User, UserRole } from '@prisma/client'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing, radii } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[6],
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  heading: {
+    fontSize: '1.25rem',
+    fontWeight: 600,
+    margin: 0,
+  },
+  form: {
+    backgroundColor: colors.white,
+    padding: spacing[6],
+    borderRadius: radii.lg,
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[4],
+  },
+  fieldGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[2],
+  },
+  actionsRow: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: spacing[4],
+  },
+  list: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[4],
+  },
+  userCard: {
+    backgroundColor: colors.white,
+    padding: spacing[4],
+    borderRadius: radii.lg,
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  userName: {
+    fontWeight: 500,
+    margin: 0,
+  },
+  userText: {
+    fontSize: '0.875rem',
+    color: colors.gray500,
+    margin: 0,
+  },
+})
 
 interface UserManagementProps {
   users: User[]
@@ -28,8 +93,7 @@ export function UserManagement({ users: initialUsers }: UserManagementProps) {
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Failed to create user')
+        throw new Error('Failed to create user')
       }
 
       const createdUser = await response.json()
@@ -42,53 +106,55 @@ export function UserManagement({ users: initialUsers }: UserManagementProps) {
       })
     } catch (error) {
       console.error('Error creating user:', error)
-      toast.error('Failed to create user', {
-        description: error instanceof Error ? error.message : 'An error occurred'
-      })
+      toast.error('Failed to create user')
     }
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Manage Users</h2>
+    <div {...stylex.props(styles.container)}>
+      <div {...stylex.props(styles.header)}>
+        <h2 {...stylex.props(styles.heading)}>Manage Users</h2>
         <Button onClick={() => setIsAddingUser(true)}>Add User</Button>
       </div>
 
       {isAddingUser && (
-        <form onSubmit={handleAddUser} className="bg-white p-6 rounded-lg shadow space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Name</label>
-            <input
+        <form onSubmit={handleAddUser} {...stylex.props(styles.form)}>
+          <div {...stylex.props(styles.fieldGroup)}>
+            <Label htmlFor="user-name">Name</Label>
+            <Input
+              id="user-name"
               type="text"
               value={newUser.name}
               onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-              className="w-full p-2 border rounded"
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Email</label>
-            <input
+          <div {...stylex.props(styles.fieldGroup)}>
+            <Label htmlFor="user-email">Email</Label>
+            <Input
+              id="user-email"
               type="email"
               value={newUser.email}
               onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-              className="w-full p-2 border rounded"
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Role</label>
-            <select
+          <div {...stylex.props(styles.fieldGroup)}>
+            <Label htmlFor="user-role">Role</Label>
+            <Select
               value={newUser.role}
-              onChange={(e) => setNewUser({ ...newUser, role: e.target.value as UserRole })}
-              className="w-full p-2 border rounded"
+              onValueChange={(val) => setNewUser({ ...newUser, role: val as UserRole })}
             >
-              <option value="CASE_MANAGER">Case Manager</option>
-              <option value="NEUTRAL">Neutral</option>
-            </select>
+              <SelectTrigger style={{ width: '100%' }}>
+                <SelectValue placeholder="Select Role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="CASE_MANAGER">Case Manager</SelectItem>
+                <SelectItem value="NEUTRAL">Neutral</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="flex justify-end space-x-4">
+          <div {...stylex.props(styles.actionsRow)}>
             <Button type="button" variant="outline" onClick={() => setIsAddingUser(false)}>
               Cancel
             </Button>
@@ -97,13 +163,13 @@ export function UserManagement({ users: initialUsers }: UserManagementProps) {
         </form>
       )}
 
-      <div className="space-y-4">
+      <div {...stylex.props(styles.list)}>
         {users.map((user) => (
-          <div key={user.id} className="bg-white p-4 rounded-lg shadow flex justify-between items-center">
+          <div key={user.id} {...stylex.props(styles.userCard)}>
             <div>
-              <h3 className="font-medium">{user.name}</h3>
-              <p className="text-sm text-gray-500">{user.email}</p>
-              <p className="text-sm text-gray-500">{user.role}</p>
+              <h3 {...stylex.props(styles.userName)}>{user.name}</h3>
+              <p {...stylex.props(styles.userText)}>{user.email}</p>
+              <p {...stylex.props(styles.userText)}>{user.role}</p>
             </div>
             <Button variant="outline">Manage</Button>
           </div>
@@ -111,4 +177,4 @@ export function UserManagement({ users: initialUsers }: UserManagementProps) {
       </div>
     </div>
   )
-} 
+}

@@ -2,24 +2,69 @@
 
 import * as React from "react"
 import * as SwitchPrimitives from "@radix-ui/react-switch"
+import * as stylex from "@stylexjs/stylex"
+import { colors, radii } from "@/styles/tokens.stylex"
 
-import { cn } from "@/lib/utils"
+export const switchStyles = stylex.create({
+  root: {
+    display: "inline-flex",
+    height: "1.5rem",
+    width: "2.75rem",
+    shrink: 0,
+    cursor: "pointer",
+    alignItems: "center",
+    borderRadius: radii.full,
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: "transparent",
+    transitionProperty: "background-color",
+    transitionDuration: "0.2s",
+    outline: "none",
+    boxSizing: "border-box",
+    backgroundColor: colors.input,
+  },
+  rootChecked: {
+    backgroundColor: colors.primary,
+  },
+  thumb: {
+    pointerEvents: "none",
+    display: "block",
+    height: "1.25rem",
+    width: "1.25rem",
+    borderRadius: radii.full,
+    backgroundColor: colors.background,
+    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+    transitionProperty: "transform",
+    transitionDuration: "0.2s",
+    transform: "translateX(0)",
+  },
+  thumbChecked: {
+    transform: "translateX(1.25rem)",
+  },
+})
+
+export interface SwitchProps extends React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> {
+  style?: stylex.StyleXStyles
+}
 
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
->(({ className, ...props }, ref) => (
+  SwitchProps
+>(({ style, checked, ...props }, ref) => (
   <SwitchPrimitives.Root
-    className={cn(
-      "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
-      className
+    ref={ref}
+    checked={checked}
+    {...stylex.props(
+      switchStyles.root,
+      checked && switchStyles.rootChecked,
+      style
     )}
     {...props}
-    ref={ref}
   >
     <SwitchPrimitives.Thumb
-      className={cn(
-        "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
+      {...stylex.props(
+        switchStyles.thumb,
+        checked && switchStyles.thumbChecked
       )}
     />
   </SwitchPrimitives.Root>

@@ -3,6 +3,24 @@
 import { useCompletion } from '@ai-sdk/react'
 import { Button } from '@/components/ui/button'
 import { useRouter, useSearch } from '@tanstack/react-router'
+import * as stylex from '@stylexjs/stylex'
+import { spacing } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  wrapper: {
+    maxWidth: '42rem',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  headerBox: {
+    marginBottom: spacing[4],
+  },
+  heading: {
+    fontSize: '1.125rem',
+    fontWeight: 600,
+    margin: 0,
+  },
+})
 
 export function Registrar() {
   const router = useRouter()
@@ -13,18 +31,16 @@ export function Registrar() {
   const handleAssignCaseManager = async () => {
     if (!caseId) return
     const response = await complete(caseId)
-    // Here you would typically update the case in a database
     console.log('Case manager assigned for case:', caseId, response)
-    // Redirect to case manager page
     router.navigate({ to: '/case-manager', search: { caseId } })
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div {...stylex.props(styles.wrapper)}>
       {caseId ? (
         <>
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold">Case Details</h2>
+          <div {...stylex.props(styles.headerBox)}>
+            <h2 {...stylex.props(styles.heading)}>Case Details</h2>
             <p>Case ID: {caseId}</p>
           </div>
           <Button onClick={handleAssignCaseManager}>
@@ -37,4 +53,3 @@ export function Registrar() {
     </div>
   )
 }
-

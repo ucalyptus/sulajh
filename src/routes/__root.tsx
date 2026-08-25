@@ -10,6 +10,19 @@ import { AuthProvider } from '@/src/context/auth'
 import NavMenu from '@/components/NavMenu'
 import Footer from '@/components/Footer'
 import '@/styles/globals.css'
+import * as stylex from '@stylexjs/stylex'
+import { fonts } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  body: {
+    fontFamily: fonts.sans,
+    margin: 0,
+    padding: 0,
+  },
+  main: {
+    minHeight: 'calc(100vh - 8rem)',
+  },
+})
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,7 +58,7 @@ function RootComponent() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <NavMenu />
-          <main className="min-h-[calc(100vh-8rem)]">
+          <main {...stylex.props(styles.main)}>
             <Outlet />
           </main>
           <Footer />
@@ -61,7 +74,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <head>
         <HeadContent />
       </head>
-      <body className="font-sans">
+      <body {...stylex.props(styles.body)}>
         {children}
         <Scripts />
       </body>

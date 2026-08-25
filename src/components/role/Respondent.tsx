@@ -5,6 +5,36 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useRouter, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  wrapper: {
+    maxWidth: '42rem',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  headerBox: {
+    marginBottom: spacing[4],
+  },
+  heading: {
+    fontSize: '1.125rem',
+    fontWeight: 600,
+    margin: 0,
+    marginBottom: spacing[2],
+  },
+  caseIdText: {
+    marginBottom: spacing[2],
+  },
+  subtitleText: {
+    fontSize: '0.875rem',
+    color: colors.gray600,
+    marginBottom: spacing[4],
+  },
+  textarea: {
+    marginBottom: spacing[4],
+  },
+})
 
 export function Respondent() {
   const router = useRouter()
@@ -16,34 +46,31 @@ export function Respondent() {
   const handleSubmitResponse = async () => {
     if (!caseId || !response.trim()) return
     
-    // Send both the case ID and response text to the AI
     const aiResponse = await complete(JSON.stringify({
       caseId,
       responseText: response
     }))
     
-    // Here you would typically update the case in a database
     console.log('Response submitted for case:', caseId, aiResponse)
-    // Redirect to neutral page with the case ID
     router.navigate({ to: '/neutral', search: { caseId } })
     localStorage.setItem(`case_${caseId}_response`, aiResponse ?? '')
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div {...stylex.props(styles.wrapper)}>
       {caseId ? (
         <>
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold">Respond to Case</h2>
-            <p className="mb-2">Case ID: {caseId}</p>
-            <p className="text-sm text-gray-600 mb-4">
+          <div {...stylex.props(styles.headerBox)}>
+            <h2 {...stylex.props(styles.heading)}>Respond to Case</h2>
+            <p {...stylex.props(styles.caseIdText)}>Case ID: {caseId}</p>
+            <p {...stylex.props(styles.subtitleText)}>
               Please provide your response to the claim:
             </p>
             <Textarea
               value={response}
               onChange={(e) => setResponse(e.target.value)}
               placeholder="Enter your response to the claim..."
-              className="mb-4"
+              style={styles.textarea}
               rows={6}
             />
           </div>
@@ -60,4 +87,3 @@ export function Respondent() {
     </div>
   )
 }
-

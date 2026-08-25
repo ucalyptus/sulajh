@@ -1,33 +1,107 @@
 import { Link } from '@tanstack/react-router'
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  footer: {
+    borderTopWidth: '1px',
+    borderTopStyle: 'solid',
+    borderTopColor: colors.border,
+    backgroundColor: 'rgba(243, 244, 246, 0.4)',
+  },
+  container: {
+    maxWidth: '1280px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    paddingLeft: spacing[4],
+    paddingRight: spacing[4],
+    paddingTop: spacing[8],
+    paddingBottom: spacing[8],
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: {
+      default: '1fr',
+      '@media (min-width: 768px)': 'repeat(3, 1fr)',
+    },
+    gap: spacing[8],
+  },
+  heading: {
+    fontWeight: 700,
+    fontSize: '1.125rem',
+    marginBottom: spacing[2],
+    color: colors.foreground,
+  },
+  subheading: {
+    fontWeight: 600,
+    fontSize: '0.875rem',
+    marginBottom: spacing[2],
+    color: colors.foreground,
+  },
+  text: {
+    fontSize: '0.875rem',
+    color: colors.mutedForeground,
+    lineHeight: 1.5,
+    margin: 0,
+  },
+  list: {
+    listStyleType: 'none',
+    padding: 0,
+    margin: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[1],
+  },
+  link: {
+    fontSize: '0.875rem',
+    color: colors.mutedForeground,
+    textDecoration: 'none',
+    transitionProperty: 'color',
+    transitionDuration: '0.2s',
+    ':hover': {
+      color: colors.foreground,
+    },
+  },
+  bottomBar: {
+    marginTop: spacing[8],
+    paddingTop: spacing[4],
+    borderTopWidth: '1px',
+    borderTopStyle: 'solid',
+    borderTopColor: colors.border,
+    textAlign: 'center',
+    fontSize: '0.75rem',
+    color: colors.mutedForeground,
+  },
+})
 
 export default function Footer() {
   return (
-    <footer className="border-t bg-muted/40">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer {...stylex.props(styles.footer)}>
+      <div {...stylex.props(styles.container)}>
+        <div {...stylex.props(styles.grid)}>
           <div>
-            <h3 className="font-bold text-lg mb-2">Sulajh</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 {...stylex.props(styles.heading)}>Sulajh</h3>
+            <p {...stylex.props(styles.text)}>
               AI-powered online dispute resolution — fair, fast, and affordable.
             </p>
           </div>
           <div>
-            <h4 className="font-semibold mb-2 text-sm">Platform</h4>
-            <ul className="space-y-1 text-sm text-muted-foreground">
-              <li><Link to="/cases/new" className="hover:text-foreground transition-colors">File a Claim</Link></li>
-              <li><Link to="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link></li>
-              <li><Link to="/auth/signin" className="hover:text-foreground transition-colors">Sign In</Link></li>
+            <h4 {...stylex.props(styles.subheading)}>Platform</h4>
+            <ul {...stylex.props(styles.list)}>
+              <li><Link to="/cases/new" {...stylex.props(styles.link)}>File a Claim</Link></li>
+              <li><Link to="/dashboard" {...stylex.props(styles.link)}>Dashboard</Link></li>
+              <li><Link to="/auth/signin" {...stylex.props(styles.link)}>Sign In</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-2 text-sm">Legal</h4>
-            <ul className="space-y-1 text-sm text-muted-foreground">
-              <li><span>Terms of Service</span></li>
-              <li><span>Privacy Policy</span></li>
+            <h4 {...stylex.props(styles.subheading)}>Legal</h4>
+            <ul {...stylex.props(styles.list)}>
+              <li><span {...stylex.props(styles.text)}>Terms of Service</span></li>
+              <li><span {...stylex.props(styles.text)}>Privacy Policy</span></li>
             </ul>
           </div>
         </div>
-        <div className="mt-8 pt-4 border-t text-center text-xs text-muted-foreground">
+        <div {...stylex.props(styles.bottomBar)}>
           © {new Date().getFullYear()} Sulajh. All rights reserved.
         </div>
       </div>

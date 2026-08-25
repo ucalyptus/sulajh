@@ -6,6 +6,139 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import StatusBadge from '@/components/StatusBadge'
 import { formatDate } from '@/lib/utils'
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  container: {
+    maxWidth: '64rem',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    paddingLeft: spacing[4],
+    paddingRight: spacing[4],
+    paddingTop: spacing[8],
+    paddingBottom: spacing[8],
+  },
+  headerRow: {
+    display: 'flex',
+    flexDirection: {
+      default: 'column',
+      '@media (min-width: 640px)': 'row',
+    },
+    alignItems: {
+      default: 'flex-start',
+      '@media (min-width: 640px)': 'center',
+    },
+    justifyContent: 'space-between',
+    gap: spacing[4],
+    marginBottom: spacing[8],
+  },
+  welcomeTitle: {
+    fontSize: '1.5rem',
+    fontWeight: 700,
+    margin: 0,
+  },
+  userMeta: {
+    fontSize: '0.875rem',
+    color: colors.mutedForeground,
+    margin: 0,
+    marginTop: spacing[0.5],
+  },
+  capitalizeText: {
+    textTransform: 'capitalize',
+  },
+  statsGrid: {
+    display: 'grid',
+    gridTemplateColumns: {
+      default: '1fr',
+      '@media (min-width: 640px)': 'repeat(3, 1fr)',
+    },
+    gap: spacing[4],
+    marginBottom: spacing[8],
+  },
+  statCard: {
+    padding: spacing[5],
+  },
+  statLabel: {
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: colors.mutedForeground,
+    margin: 0,
+  },
+  statValue: {
+    fontSize: '1.875rem',
+    fontWeight: 700,
+    marginTop: spacing[1],
+    margin: 0,
+  },
+  openValue: {
+    color: colors.primary,
+  },
+  resolvedValue: {
+    color: colors.emerald700,
+  },
+  sectionHeading: {
+    fontSize: '1.125rem',
+    fontWeight: 600,
+    marginBottom: spacing[4],
+    margin: 0,
+  },
+  emptyCard: {
+    padding: spacing[8],
+    textAlign: 'center',
+  },
+  emptyText: {
+    color: colors.mutedForeground,
+    marginBottom: spacing[4],
+    margin: 0,
+  },
+  casesGrid: {
+    display: 'grid',
+    gap: spacing[3],
+  },
+  caseLink: {
+    display: 'block',
+    textDecoration: 'none',
+    color: 'inherit',
+  },
+  caseCard: {
+    padding: spacing[5],
+    transitionProperty: 'box-shadow',
+    transitionDuration: '0.2s',
+    ':hover': {
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    },
+  },
+  caseCardInner: {
+    display: 'flex',
+    flexDirection: {
+      default: 'column',
+      '@media (min-width: 640px)': 'row',
+    },
+    alignItems: {
+      default: 'flex-start',
+      '@media (min-width: 640px)': 'center',
+    },
+    justifyContent: 'space-between',
+    gap: spacing[3],
+  },
+  caseTextWrapper: {
+    minWidth: 0,
+  },
+  caseTitle: {
+    fontWeight: 500,
+    margin: 0,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  caseMeta: {
+    fontSize: '0.875rem',
+    color: colors.mutedForeground,
+    marginTop: spacing[0.5],
+    margin: 0,
+  },
+})
 
 const getDashboardData = createServerFn({ method: 'GET' }).handler(async () => {
   const session = await getSession()
@@ -30,8 +163,8 @@ const getDashboardData = createServerFn({ method: 'GET' }).handler(async () => {
     orderBy: { createdAt: 'desc' },
     select: {
       id: true,
-      claimantRequest: true,
       status: true,
+      claimantRequest: true,
       createdAt: true,
       respondent: { select: { email: true } },
     },
@@ -54,21 +187,26 @@ function DashboardPage() {
 
   const getEmptyStateMessage = (role: string) => {
     switch (role) {
-      case 'CLAIMANT': return "You haven't filed any cases yet. Ready to file your first claim?"
-      case 'RESPONDENT': return "You haven't received any cases yet."
-      case 'CASE_MANAGER': return "You haven't been assigned to any cases yet."
-      case 'NEUTRAL': return "You haven't received any mediation requests yet."
-      default: return 'No cases found.'
+      case 'CLAIMANT':
+        return "You haven't filed any claims yet."
+      case 'RESPONDENT':
+        return 'No cases filed against you yet.'
+      case 'CASE_MANAGER':
+        return 'No cases assigned to you for management.'
+      case 'NEUTRAL':
+        return 'No cases assigned to you for neutral review.'
+      default:
+        return 'No cases found.'
     }
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+    <div {...stylex.props(styles.container)}>
+      <div {...stylex.props(styles.headerRow)}>
         <div>
-          <h1 className="text-2xl font-bold">Welcome back, {user.name || 'User'}</h1>
-          <p className="text-sm text-muted-foreground">
-            {user.email} · <span className="capitalize">{user.role.toLowerCase().replace('_', ' ')}</span> · Member since {formatDate(user.createdAt)}
+          <h1 {...stylex.props(styles.welcomeTitle)}>Welcome back, {user.name || 'User'}</h1>
+          <p {...stylex.props(styles.userMeta)}>
+            {user.email} · <span {...stylex.props(styles.capitalizeText)}>{user.role.toLowerCase().replace('_', ' ')}</span> · Member since {formatDate(user.createdAt)}
           </p>
         </div>
         {(user.role === 'CLAIMANT' || user.role === 'REGISTRAR') && (
@@ -78,25 +216,25 @@ function DashboardPage() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <Card className="p-5">
-          <p className="text-sm font-medium text-muted-foreground">Total Cases</p>
-          <p className="text-3xl font-bold mt-1">{cases.length}</p>
+      <div {...stylex.props(styles.statsGrid)}>
+        <Card style={styles.statCard}>
+          <p {...stylex.props(styles.statLabel)}>Total Cases</p>
+          <p {...stylex.props(styles.statValue)}>{cases.length}</p>
         </Card>
-        <Card className="p-5">
-          <p className="text-sm font-medium text-muted-foreground">Open</p>
-          <p className="text-3xl font-bold mt-1 text-primary">{openCases.length}</p>
+        <Card style={styles.statCard}>
+          <p {...stylex.props(styles.statLabel)}>Open</p>
+          <p {...stylex.props(styles.statValue, styles.openValue)}>{openCases.length}</p>
         </Card>
-        <Card className="p-5">
-          <p className="text-sm font-medium text-muted-foreground">Resolved</p>
-          <p className="text-3xl font-bold mt-1 text-emerald-600">{resolvedCases.length}</p>
+        <Card style={styles.statCard}>
+          <p {...stylex.props(styles.statLabel)}>Resolved</p>
+          <p {...stylex.props(styles.statValue, styles.resolvedValue)}>{resolvedCases.length}</p>
         </Card>
       </div>
 
-      <h2 className="text-lg font-semibold mb-4">Your Cases</h2>
+      <h2 {...stylex.props(styles.sectionHeading)}>Your Cases</h2>
       {cases.length === 0 ? (
-        <Card className="p-8 text-center">
-          <p className="text-muted-foreground mb-4">{getEmptyStateMessage(user.role)}</p>
+        <Card style={styles.emptyCard}>
+          <p {...stylex.props(styles.emptyText)}>{getEmptyStateMessage(user.role)}</p>
           {(user.role === 'CLAIMANT' || user.role === 'REGISTRAR') && (
             <Link to="/cases/new">
               <Button variant="outline">File a Claim</Button>
@@ -104,18 +242,18 @@ function DashboardPage() {
           )}
         </Card>
       ) : (
-        <div className="grid gap-3">
+        <div {...stylex.props(styles.casesGrid)}>
           {cases.map((case_) => (
-            <Link key={case_.id} to="/cases/$id" params={{ id: case_.id }} className="block">
-              <Card className="p-5 hover:shadow-md transition-shadow">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <h3 className="font-medium truncate">
+            <Link key={case_.id} to="/cases/$id" params={{ id: case_.id }} {...stylex.props(styles.caseLink)}>
+              <Card style={styles.caseCard}>
+                <div {...stylex.props(styles.caseCardInner)}>
+                  <div {...stylex.props(styles.caseTextWrapper)}>
+                    <h3 {...stylex.props(styles.caseTitle)}>
                       {case_.claimantRequest
                         ? case_.claimantRequest.substring(0, 100)
                         : 'No details provided'}
                     </h3>
-                    <p className="text-sm text-muted-foreground mt-0.5">
+                    <p {...stylex.props(styles.caseMeta)}>
                       Respondent: {case_.respondent?.email || 'Pending'} · {formatDate(case_.createdAt)}
                     </p>
                   </div>

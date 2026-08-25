@@ -3,6 +3,19 @@
 import { useCompletion } from '@ai-sdk/react'
 import { Button } from '@/components/ui/button'
 import { useRouter, useSearch } from '@tanstack/react-router'
+import * as stylex from '@stylexjs/stylex'
+import { spacing } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  wrapper: {
+    maxWidth: '42rem',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  text: {
+    marginBottom: spacing[4],
+  },
+})
 
 export function Platform() {
   const router = useRouter()
@@ -13,17 +26,15 @@ export function Platform() {
   const handleNotifyRegistrar = async () => {
     if (!caseId) return
     const response = await complete(caseId)
-    // Here you would typically update the case in a database
     console.log('Registrar notified for case:', caseId, response)
-    // Redirect to registrar page with the case ID
     router.navigate({ to: '/registrar', search: { caseId } })
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div {...stylex.props(styles.wrapper)}>
       {caseId ? (
         <>
-          <p className="mb-4">Case ID: {caseId}</p>
+          <p {...stylex.props(styles.text)}>Case ID: {caseId}</p>
           <Button onClick={handleNotifyRegistrar}>
             Notify Registrar
           </Button>
@@ -34,4 +45,3 @@ export function Platform() {
     </div>
   )
 }
-

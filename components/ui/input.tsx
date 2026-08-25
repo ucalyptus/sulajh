@@ -1,17 +1,49 @@
 import * as React from "react"
+import * as stylex from "@stylexjs/stylex"
+import { colors, spacing, radii } from "@/styles/tokens.stylex"
 
-import { cn } from "@/lib/utils"
+export const inputStyles = stylex.create({
+  input: {
+    display: "flex",
+    height: "2.5rem",
+    width: "100%",
+    borderRadius: radii.md,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.input,
+    backgroundColor: colors.background,
+    paddingLeft: spacing[3],
+    paddingRight: spacing[3],
+    paddingTop: spacing[2],
+    paddingBottom: spacing[2],
+    fontSize: "0.875rem",
+    color: colors.foreground,
+    boxSizing: "border-box",
+    outline: "none",
+    transitionProperty: "border-color, box-shadow",
+    transitionDuration: "0.2s",
+    ":focus": {
+      borderColor: colors.ring,
+      boxShadow: "0 0 0 2px rgba(37, 99, 235, 0.2)",
+    },
+    ":disabled": {
+      cursor: "not-allowed",
+      opacity: 0.5,
+    },
+  },
+})
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
+export interface InputProps extends React.ComponentProps<"input"> {
+  style?: stylex.StyleXStyles
+}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ type, style, ...props }, ref) => {
     return (
       <input
         type={type}
-        className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-          className
-        )}
         ref={ref}
+        {...stylex.props(inputStyles.input, style)}
         {...props}
       />
     )

@@ -12,37 +12,121 @@ import {
 } from '@tanstack/react-table'
 import { useState } from 'react'
 import { Input } from '@/components/ui/input'
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing, radii } from '@/styles/tokens.stylex'
 
-const getAdminCases = createServerFn({ method: 'GET' }).handler(async () => {
-  const cases = await prisma.case.findMany({
-    include: {
-      claimant: { select: { id: true, name: true, email: true } },
-      respondent: { select: { id: true, name: true, email: true } },
-      caseManager: { select: { id: true, name: true, email: true } },
+const styles = stylex.create({
+  page: {
+    padding: spacing[8],
+  },
+  headerRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing[6],
+  },
+  title: {
+    fontSize: '1.5rem',
+    fontWeight: 700,
+    margin: 0,
+  },
+  meta: {
+    fontSize: '0.875rem',
+    color: colors.gray500,
+  },
+  searchInput: {
+    maxWidth: '24rem',
+    marginBottom: spacing[4],
+  },
+  tableWrapper: {
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colors.border,
+    borderRadius: radii.lg,
+    overflow: 'hidden',
+  },
+  table: {
+    width: '100%',
+    fontSize: '0.875rem',
+    borderCollapse: 'collapse',
+  },
+  thead: {
+    backgroundColor: colors.muted,
+  },
+  th: {
+    textAlign: 'left',
+    padding: spacing[3],
+    fontWeight: 500,
+    cursor: 'pointer',
+    userSelect: 'none',
+  },
+  tr: {
+    borderTopWidth: '1px',
+    borderTopStyle: 'solid',
+    borderTopColor: colors.border,
+    ':hover': {
+      backgroundColor: 'rgba(243, 244, 246, 0.5)',
     },
+  },
+  td: {
+    padding: spacing[3],
+  },
+  badge: {
+    paddingLeft: spacing[2],
+    paddingRight: spacing[2],
+    paddingTop: spacing[0.5],
+    paddingBottom: spacing[0.5],
+    fontSize: '0.75rem',
+    borderRadius: radii.full,
+    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+    color: colors.primary,
+    fontWeight: 500,
+  },
+  monoText: {
+    fontFamily: 'monospace',
+    fontSize: '0.75rem',
+  },
+})
+
+export interface CaseRow {
+  id: string
+  status: string
+  createdAt: string
+  claimant: { email: string }
+  respondent: { email: string } | null
+  caseManager: { name: string | null } | null
+}
+
+const getAdminCases = createServerFn({ method: 'GET' }).handler(async (): Promise<CaseRow[]> => {
+  const cases = await prisma.case.findMany({
     orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      status: true,
+      createdAt: true,
+      claimant: { select: { email: true } },
+      respondent: { select: { email: true } },
+      caseManager: { select: { name: true } },
+    },
   })
 
   return cases.map((case_) => ({
     ...case_,
     createdAt: formatDate(case_.createdAt),
-    submissionDate: formatDate(case_.submissionDate),
   }))
 })
-
-type CaseRow = Awaited<ReturnType<typeof getAdminCases>>[number]
 
 const columnHelper = createColumnHelper<CaseRow>()
 
 const columns = [
   columnHelper.accessor('id', {
     header: 'ID',
-    cell: (info) => <span className="font-mono text-xs">{info.getValue().slice(0, 8)}…</span>,
+    cell: (info) => <span {...stylex.props(styles.monoText)}>{info.getValue().slice(0, 8)}…</span>,
   }),
   columnHelper.accessor('status', {
     header: 'Status',
     cell: (info) => (
-      <span className="px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary font-medium">
+      <span {...stylex.props(styles.badge)}>
         {info.getValue()}
       </span>
     ),
@@ -83,28 +167,28 @@ function AdminCasesPage() {
   })
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Case Management</h1>
-        <div className="text-sm text-gray-500">Total: {cases.length}</div>
+    <div {...stylex.props(styles.page)}>
+      <div {...stylex.props(styles.headerRow)}>
+        <h1 {...stylex.props(styles.title)}>Case Management</h1>
+        <div {...stylex.props(styles.meta)}>Total: {cases.length}</div>
       </div>
 
       <Input
         placeholder="Search cases…"
         value={globalFilter}
         onChange={(e) => setGlobalFilter(e.target.value)}
-        className="max-w-sm mb-4"
+        style={styles.searchInput}
       />
 
-      <div className="border rounded-lg overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-muted">
+      <div {...stylex.props(styles.tableWrapper)}>
+        <table {...stylex.props(styles.table)}>
+          <thead {...stylex.props(styles.thead)}>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="text-left p-3 font-medium cursor-pointer select-none"
+                    {...stylex.props(styles.th)}
                     onClick={header.column.getToggleSortingHandler()}
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
@@ -116,9 +200,9 @@ function AdminCasesPage() {
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="border-t hover:bg-muted/50">
+              <tr key={row.id} {...stylex.props(styles.tr)}>
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="p-3">
+                  <td key={cell.id} {...stylex.props(styles.td)}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

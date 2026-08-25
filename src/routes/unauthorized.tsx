@@ -1,4 +1,28 @@
 import { createFileRoute } from '@tanstack/react-router'
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  wrapper: {
+    minHeight: '60vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  content: {
+    textAlign: 'center',
+  },
+  heading: {
+    fontSize: '1.875rem',
+    fontWeight: 700,
+    marginBottom: spacing[4],
+    margin: 0,
+  },
+  subtitle: {
+    color: colors.mutedForeground,
+    margin: 0,
+  },
+})
 
 export const Route = createFileRoute('/unauthorized')({
   component: UnauthorizedPage,
@@ -6,10 +30,10 @@ export const Route = createFileRoute('/unauthorized')({
 
 function UnauthorizedPage() {
   return (
-    <div className="min-h-[60vh] flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-4">Unauthorized</h1>
-        <p className="text-muted-foreground">You do not have permission to access this page.</p>
+    <div {...stylex.props(styles.wrapper)}>
+      <div {...stylex.props(styles.content)}>
+        <h1 {...stylex.props(styles.heading)}>Unauthorized</h1>
+        <p {...stylex.props(styles.subtitle)}>You do not have permission to access this page.</p>
       </div>
     </div>
   )

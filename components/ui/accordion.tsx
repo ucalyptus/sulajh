@@ -3,18 +3,60 @@
 import * as React from "react"
 import * as AccordionPrimitive from "@radix-ui/react-accordion"
 import { ChevronDown } from "lucide-react"
+import * as stylex from "@stylexjs/stylex"
+import { colors, spacing } from "@/styles/tokens.stylex"
 
-import { cn } from "@/lib/utils"
+export const accordionStyles = stylex.create({
+  item: {
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.border,
+  },
+  header: {
+    display: "flex",
+    margin: 0,
+  },
+  trigger: {
+    display: "flex",
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: spacing[4],
+    paddingBottom: spacing[4],
+    fontWeight: 500,
+    fontSize: "0.875rem",
+    color: colors.foreground,
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    cursor: "pointer",
+    textDecoration: {
+      default: "none",
+      ":hover": "underline",
+    },
+  },
+  content: {
+    overflow: "hidden",
+    fontSize: "0.875rem",
+  },
+  contentInner: {
+    paddingBottom: spacing[4],
+    paddingTop: 0,
+  },
+})
 
 const Accordion = AccordionPrimitive.Root
 
+export interface AccordionComponentProps {
+  style?: stylex.StyleXStyles
+}
+
 const AccordionItem = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item> & AccordionComponentProps
+>(({ style, ...props }, ref) => (
   <AccordionPrimitive.Item
     ref={ref}
-    className={cn("border-b", className)}
+    {...stylex.props(accordionStyles.item, style)}
     {...props}
   />
 ))
@@ -22,19 +64,16 @@ AccordionItem.displayName = "AccordionItem"
 
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-  <AccordionPrimitive.Header className="flex">
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> & AccordionComponentProps
+>(({ style, children, ...props }, ref) => (
+  <AccordionPrimitive.Header {...stylex.props(accordionStyles.header)}>
     <AccordionPrimitive.Trigger
       ref={ref}
-      className={cn(
-        "flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
-        className
-      )}
+      {...stylex.props(accordionStyles.trigger, style)}
       {...props}
     >
       {children}
-      <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+      <ChevronDown style={{ width: 16, height: 16 }} />
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
 ))
@@ -42,17 +81,16 @@ AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
 
 const AccordionContent = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content> & AccordionComponentProps
+>(({ style, children, ...props }, ref) => (
   <AccordionPrimitive.Content
     ref={ref}
-    className="overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+    {...stylex.props(accordionStyles.content)}
     {...props}
   >
-    <div className={cn("pb-4 pt-0", className)}>{children}</div>
+    <div {...stylex.props(accordionStyles.contentInner, style)}>{children}</div>
   </AccordionPrimitive.Content>
 ))
-
 AccordionContent.displayName = AccordionPrimitive.Content.displayName
 
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }

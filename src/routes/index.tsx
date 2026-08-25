@@ -3,6 +3,222 @@ import { createServerFn } from '@tanstack/react-start'
 import { getSession } from '@/src/server/auth'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing, radii } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  page: {
+    backgroundColor: colors.background,
+  },
+  hero: {
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  heroGradient: {
+    position: 'absolute',
+    inset: 0,
+    background: 'linear-gradient(to bottom right, rgba(37, 99, 235, 0.05), transparent, rgba(37, 99, 235, 0.1))',
+  },
+  heroContainer: {
+    position: 'relative',
+    maxWidth: '1280px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    paddingLeft: spacing[4],
+    paddingRight: spacing[4],
+    paddingTop: {
+      default: spacing[20],
+      '@media (min-width: 640px)': spacing[28],
+    },
+    paddingBottom: {
+      default: spacing[20],
+      '@media (min-width: 640px)': spacing[28],
+    },
+  },
+  heroContent: {
+    textAlign: 'center',
+    maxWidth: '48rem',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  heroTitle: {
+    fontSize: {
+      default: '2.25rem',
+      '@media (min-width: 640px)': '3rem',
+      '@media (min-width: 1024px)': '3.75rem',
+    },
+    fontWeight: 700,
+    letterSpacing: '-0.025em',
+    color: colors.foreground,
+    marginBottom: spacing[6],
+    margin: 0,
+  },
+  titleHighlight: {
+    color: colors.primary,
+  },
+  heroSubtitle: {
+    fontSize: {
+      default: '1.125rem',
+      '@media (min-width: 640px)': '1.25rem',
+    },
+    color: colors.mutedForeground,
+    marginBottom: spacing[8],
+    maxWidth: '42rem',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    lineHeight: 1.6,
+  },
+  heroActions: {
+    display: 'flex',
+    flexDirection: {
+      default: 'column',
+      '@media (min-width: 640px)': 'row',
+    },
+    gap: spacing[4],
+    justifyContent: 'center',
+  },
+  ctaButton: {
+    width: {
+      default: '100%',
+      '@media (min-width: 640px)': 'auto',
+    },
+    fontSize: '1rem',
+    paddingLeft: spacing[8],
+    paddingRight: spacing[8],
+  },
+  section: {
+    maxWidth: '1280px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    paddingLeft: spacing[4],
+    paddingRight: spacing[4],
+    paddingTop: {
+      default: spacing[16],
+      '@media (min-width: 640px)': spacing[20],
+    },
+    paddingBottom: {
+      default: spacing[16],
+      '@media (min-width: 640px)': spacing[20],
+    },
+  },
+  sectionHeader: {
+    textAlign: 'center',
+    marginBottom: spacing[12],
+  },
+  sectionTitle: {
+    fontSize: '1.875rem',
+    fontWeight: 700,
+    color: colors.foreground,
+    marginBottom: spacing[3],
+    margin: 0,
+  },
+  sectionSubtitle: {
+    color: colors.mutedForeground,
+    maxWidth: '36rem',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    margin: 0,
+  },
+  gridFeatures: {
+    display: 'grid',
+    gridTemplateColumns: {
+      default: '1fr',
+      '@media (min-width: 768px)': 'repeat(2, 1fr)',
+      '@media (min-width: 1024px)': 'repeat(3, 1fr)',
+    },
+    gap: spacing[6],
+  },
+  featureCard: {
+    padding: spacing[6],
+    transitionProperty: 'box-shadow',
+    transitionDuration: '0.2s',
+    ':hover': {
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    },
+  },
+  featureIcon: {
+    fontSize: '1.875rem',
+    marginBottom: spacing[3],
+  },
+  featureTitle: {
+    fontWeight: 600,
+    fontSize: '1.125rem',
+    marginBottom: spacing[1],
+    margin: 0,
+  },
+  featureDesc: {
+    fontSize: '0.875rem',
+    color: colors.mutedForeground,
+    margin: 0,
+    lineHeight: 1.5,
+  },
+  howSection: {
+    backgroundColor: 'rgba(243, 244, 246, 0.4)',
+    paddingTop: {
+      default: spacing[16],
+      '@media (min-width: 640px)': spacing[20],
+    },
+    paddingBottom: {
+      default: spacing[16],
+      '@media (min-width: 640px)': spacing[20],
+    },
+  },
+  howContainer: {
+    maxWidth: '64rem',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    paddingLeft: spacing[4],
+    paddingRight: spacing[4],
+  },
+  gridSteps: {
+    display: 'grid',
+    gridTemplateColumns: {
+      default: '1fr',
+      '@media (min-width: 640px)': 'repeat(2, 1fr)',
+      '@media (min-width: 1024px)': 'repeat(4, 1fr)',
+    },
+    gap: spacing[8],
+  },
+  stepCard: {
+    textAlign: 'center',
+  },
+  stepBadge: {
+    width: '3rem',
+    height: '3rem',
+    borderRadius: radii.full,
+    backgroundColor: colors.primary,
+    color: colors.primaryForeground,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '1.125rem',
+    fontWeight: 700,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginBottom: spacing[4],
+  },
+  stepTitle: {
+    fontWeight: 600,
+    marginBottom: spacing[1],
+    margin: 0,
+  },
+  ctaSection: {
+    maxWidth: '56rem',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    paddingLeft: spacing[4],
+    paddingRight: spacing[4],
+    paddingTop: {
+      default: spacing[16],
+      '@media (min-width: 640px)': spacing[20],
+    },
+    paddingBottom: {
+      default: spacing[16],
+      '@media (min-width: 640px)': spacing[20],
+    },
+    textAlign: 'center',
+  },
+})
 
 const getHomeData = createServerFn({ method: 'GET' }).handler(async () => {
   return await getSession()
@@ -33,36 +249,36 @@ function Home() {
   const session = Route.useLoaderData()
 
   return (
-    <div className="bg-background">
+    <div {...stylex.props(styles.page)}>
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/10" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-          <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-6">
+      <section {...stylex.props(styles.hero)}>
+        <div {...stylex.props(styles.heroGradient)} />
+        <div {...stylex.props(styles.heroContainer)}>
+          <div {...stylex.props(styles.heroContent)}>
+            <h1 {...stylex.props(styles.heroTitle)}>
               Resolve Disputes
-              <span className="text-primary"> Fairly & Fast</span>
+              <span {...stylex.props(styles.titleHighlight)}> Fairly & Fast</span>
             </h1>
-            <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p {...stylex.props(styles.heroSubtitle)}>
               Sulajh is an AI-powered online dispute resolution platform.
               File a claim, negotiate, and reach a fair settlement — all online,
               in days instead of months.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div {...stylex.props(styles.heroActions)}>
               <Link to={session ? '/cases/new' : '/auth/signup'}>
-                <Button size="lg" className="w-full sm:w-auto text-base px-8">
+                <Button size="lg" style={styles.ctaButton}>
                   {session ? 'File a Claim' : 'Get Started Free'}
                 </Button>
               </Link>
               {session ? (
                 <Link to="/dashboard">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto text-base px-8">
+                  <Button size="lg" variant="outline" style={styles.ctaButton}>
                     Go to Dashboard
                   </Button>
                 </Link>
               ) : (
                 <Link to="/auth/signin">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto text-base px-8">
+                  <Button size="lg" variant="outline" style={styles.ctaButton}>
                     Sign In
                   </Button>
                 </Link>
@@ -73,39 +289,39 @@ function Home() {
       </section>
 
       {/* Features Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-3">Why Choose Sulajh?</h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
+      <section {...stylex.props(styles.section)}>
+        <div {...stylex.props(styles.sectionHeader)}>
+          <h2 {...stylex.props(styles.sectionTitle)}>Why Choose Sulajh?</h2>
+          <p {...stylex.props(styles.sectionSubtitle)}>
             A modern approach to dispute resolution that saves time, money, and stress.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div {...stylex.props(styles.gridFeatures)}>
           {features.map((f) => (
-            <Card key={f.title} className="p-6 hover:shadow-md transition-shadow">
-              <div className="text-3xl mb-3">{f.icon}</div>
-              <h3 className="font-semibold text-lg mb-1">{f.title}</h3>
-              <p className="text-sm text-muted-foreground">{f.description}</p>
+            <Card key={f.title} style={styles.featureCard}>
+              <div {...stylex.props(styles.featureIcon)}>{f.icon}</div>
+              <h3 {...stylex.props(styles.featureTitle)}>{f.title}</h3>
+              <p {...stylex.props(styles.featureDesc)}>{f.description}</p>
             </Card>
           ))}
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="bg-muted/40 py-16 sm:py-20">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-3">How It Works</h2>
-            <p className="text-muted-foreground">Four simple steps to resolve your dispute.</p>
+      <section {...stylex.props(styles.howSection)}>
+        <div {...stylex.props(styles.howContainer)}>
+          <div {...stylex.props(styles.sectionHeader)}>
+            <h2 {...stylex.props(styles.sectionTitle)}>How It Works</h2>
+            <p {...stylex.props(styles.sectionSubtitle)}>Four simple steps to resolve your dispute.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div {...stylex.props(styles.gridSteps)}>
             {steps.map((s) => (
-              <div key={s.step} className="text-center">
-                <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-bold mx-auto mb-4">
+              <div key={s.step} {...stylex.props(styles.stepCard)}>
+                <div {...stylex.props(styles.stepBadge)}>
                   {s.step}
                 </div>
-                <h3 className="font-semibold mb-1">{s.title}</h3>
-                <p className="text-sm text-muted-foreground">{s.description}</p>
+                <h3 {...stylex.props(styles.stepTitle)}>{s.title}</h3>
+                <p {...stylex.props(styles.featureDesc)}>{s.description}</p>
               </div>
             ))}
           </div>
@@ -113,13 +329,13 @@ function Home() {
       </section>
 
       {/* CTA */}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center">
-        <h2 className="text-3xl font-bold text-foreground mb-4">Ready to Resolve Your Dispute?</h2>
-        <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+      <section {...stylex.props(styles.ctaSection)}>
+        <h2 {...stylex.props(styles.sectionTitle)}>Ready to Resolve Your Dispute?</h2>
+        <p {...stylex.props(styles.sectionSubtitle)}>
           Join thousands using Sulajh for faster, fairer outcomes. No lawyers needed.
         </p>
         <Link to={session ? '/cases/new' : '/auth/signup'}>
-          <Button size="lg" className="text-base px-8">
+          <Button size="lg" style={styles.ctaButton}>
             {session ? 'File a Claim Now' : 'Create Your Free Account'}
           </Button>
         </Link>

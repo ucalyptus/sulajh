@@ -3,7 +3,37 @@
 import { useState } from 'react'
 import { User, Case } from '@prisma/client'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
+import * as stylex from '@stylexjs/stylex'
+import { colors, spacing, radii } from '@/styles/tokens.stylex'
+
+const styles = stylex.create({
+  container: {
+    marginTop: spacing[4],
+  },
+  card: {
+    marginTop: spacing[4],
+    backgroundColor: colors.white,
+    padding: spacing[4],
+    borderRadius: radii.lg,
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[4],
+  },
+  fieldGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[2],
+  },
+  actionsRow: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: spacing[4],
+  },
+})
 
 type CaseWithParties = Case & {
   claimant: User
@@ -29,8 +59,8 @@ export function CaseAssignment({ case_, caseManagers, neutrals, onAssign }: Case
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          caseManagerId: selectedCaseManager || null,
-          neutralId: selectedNeutral || null
+          caseManagerId: selectedCaseManager,
+          neutralId: selectedNeutral
         })
       })
 
@@ -48,7 +78,7 @@ export function CaseAssignment({ case_, caseManagers, neutrals, onAssign }: Case
   }
 
   return (
-    <div>
+    <div {...stylex.props(styles.container)}>
       <Button 
         variant="outline" 
         onClick={() => setIsAssigning(!isAssigning)}
@@ -57,44 +87,46 @@ export function CaseAssignment({ case_, caseManagers, neutrals, onAssign }: Case
       </Button>
 
       {isAssigning && (
-        <div className="mt-4 space-y-4 bg-white p-4 rounded-lg shadow">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Case Manager
-            </label>
-            <select
+        <div {...stylex.props(styles.card)}>
+          <div {...stylex.props(styles.fieldGroup)}>
+            <Label htmlFor="case-manager-select">Case Manager</Label>
+            <Select
               value={selectedCaseManager}
-              onChange={(e) => setSelectedCaseManager(e.target.value)}
-              className="w-full p-2 border rounded"
+              onValueChange={setSelectedCaseManager}
             >
-              <option value="">Select Case Manager</option>
-              {caseManagers.map((cm) => (
-                <option key={cm.id} value={cm.id}>
-                  {cm.name} ({cm.email})
-                </option>
-              ))}
-            </select>
+              <SelectTrigger style={{ width: '100%' }}>
+                <SelectValue placeholder="Select Case Manager" />
+              </SelectTrigger>
+              <SelectContent>
+                {caseManagers.map((cm) => (
+                  <SelectItem key={cm.id} value={cm.id}>
+                    {cm.name} ({cm.email})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Neutral
-            </label>
-            <select
+          <div {...stylex.props(styles.fieldGroup)}>
+            <Label htmlFor="neutral-select">Neutral</Label>
+            <Select
               value={selectedNeutral}
-              onChange={(e) => setSelectedNeutral(e.target.value)}
-              className="w-full p-2 border rounded"
+              onValueChange={setSelectedNeutral}
             >
-              <option value="">Select Neutral</option>
-              {neutrals.map((n) => (
-                <option key={n.id} value={n.id}>
-                  {n.name} ({n.email})
-                </option>
-              ))}
-            </select>
+              <SelectTrigger style={{ width: '100%' }}>
+                <SelectValue placeholder="Select Neutral" />
+              </SelectTrigger>
+              <SelectContent>
+                {neutrals.map((n) => (
+                  <SelectItem key={n.id} value={n.id}>
+                    {n.name} ({n.email})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="flex justify-end space-x-4">
+          <div {...stylex.props(styles.actionsRow)}>
             <Button 
               variant="outline" 
               onClick={() => setIsAssigning(false)}
@@ -109,4 +141,4 @@ export function CaseAssignment({ case_, caseManagers, neutrals, onAssign }: Case
       )}
     </div>
   )
-} 
+}
