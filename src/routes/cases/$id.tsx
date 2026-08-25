@@ -98,14 +98,31 @@ const getCaseData = createServerFn({ method: 'GET' })
     const session = await getSession()
     if (!session) throw redirect({ to: '/auth/signin' })
 
+    // Minimal projection: never ship full User records (password hashes) or
+    // invitation tokens to the client. Only the invitation email is exposed
+    // so a pending respondent can see which address was invited.
     const case_ = await prisma.case.findUnique({
       where: { id: data.id },
-      include: {
-        claimant: true,
-        respondent: true,
-        caseManager: true,
-        neutral: true,
-        invitations: true,
+      select: {
+        id: true,
+        status: true,
+        claimantId: true,
+        respondentId: true,
+        caseManagerId: true,
+        neutralId: true,
+        claimantRequest: true,
+        respondentResponse: true,
+        finalDecision: true,
+        createdAt: true,
+        updatedAt: true,
+        claimant: { select: { id: true, name: true, email: true } },
+        respondent: { select: { id: true, name: true, email: true } },
+        caseManager: { select: { id: true, name: true, email: true } },
+        neutral: { select: { id: true, name: true, email: true } },
+        invitations: {
+          where: { status: 'PENDING' },
+          select: { email: true },
+        },
       },
     })
 
@@ -120,12 +137,19 @@ const getCaseData = createServerFn({ method: 'GET' })
 
     if (!hasAccess) throw notFound()
 
-    let caseManagers: any[] = []
-    let neutrals: any[] = []
+    let caseManagers: { id: string; name: string | null; email: string }[] = []
+    let neutrals: { id: string; name: string | null; email: string }[] = []
 
     if (session.role === 'REGISTRAR') {
-      caseManagers = await prisma.user.findMany({ where: { role: 'CASE_MANAGER' } })
-      neutrals = await prisma.user.findMany({ where: { role: 'NEUTRAL' } })
+      const select = { id: true, name: true, email: true } as const
+      caseManagers = await prisma.user.findMany({
+        where: { role: 'CASE_MANAGER' },
+        select,
+      })
+      neutrals = await prisma.user.findMany({
+        where: { role: 'NEUTRAL' },
+        select,
+      })
     }
 
     return { case_, session, caseManagers, neutrals }
