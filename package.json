@@ -89,7 +89,8 @@
     "@vitejs/plugin-react": "^6.0.2",
     "prisma": "^6.5.0",
     "typescript": "^5",
-    "vite": "^8.0.16"
+    "vite": "^8.0.16",
+    "unplugin": "^2.3.11"
   },
   "overrides": {
     "lodash": "^4.18.1",
